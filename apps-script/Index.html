@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <?!= include('Stylesheet'); ?>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-inner">
+        <span class="badge">🍽️ <?= CONFIG.COMPANY_NAME ?></span>
+        <h1 id="pageTitle"><?= CONFIG.PAGE_TITLE ?></h1>
+        <p class="subtitle">Bir tarih seçin, günün menüsü aşağıda açılsın.</p>
+
+        <div class="controls">
+          <label for="dateSelect">Tarih:</label>
+          <select id="dateSelect"><option>Yükleniyor…</option></select>
+          <button id="todayBtn" type="button">Bugün</button>
+        </div>
+
+        <input id="search" type="search" placeholder="Yemek ara… (ör. çorba, kebap, salata)" autocomplete="off">
+      </div>
+    </header>
+
+    <main id="menu" class="menu">
+      <div class="loading">
+        <div class="spinner"></div>
+        Menü yükleniyor…
+      </div>
+    </main>
+
+    <footer class="foot">
+      Veriler Google E-Tablo'dan canlı çekilir · <span id="genAt"></span>
+    </footer>
+  </div>
+
+  <?!= include('JavaScript'); ?>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<script>
+  var STATE = { data: null, openIso: null };
+
+  var MONTHS_SHORT = ['OCA','ŞUB','MAR','NİS','MAY','HAZ','TEM','AĞU','EYL','EKİ','KAS','ARA'];
+
+  document.addEventListener('DOMContentLoaded', function () {
+    google.script.run
+      .withSuccessHandler(onData)
+      .withFailureHandler(onError)
+      .getMenuData();
+
+    document.getElementById('todayBtn').addEventListener('click', goToToday);
+    document.getElementById('dateSelect').addEventListener('change', function () {
+      if (this.value) openDay(this.value, true);
+    });
+    document.getElementById('search').addEventListener('input', function () {
+      applySearch(this.value);
+    });
+  });
+
+  function onError(err) {
+    document.getElementById('menu').innerHTML =
+      '<div class="error">Menü yüklenemedi.<br><small>' + escapeHtml(err && err.message ? err.message : err) +
+      '</small><br><br>Lütfen CONFIG içindeki SPREADSHEET_ID / SHEET_NAME değerlerini kontrol edin.</div>';
+  }
+
+  function onData(data) {
+    STATE.data = data;
+    document.getElementById('pageTitle').textContent = data.title || 'Yemek Listesi';
+    document.getElementById('genAt').textContent = 'Son güncelleme: ' + (data.generatedAt || '');
+
+    if (!data.days || !data.days.length) {
+      document.getElementById('menu').innerHTML =
+        '<div class="error">E-Tabloda tarih başlığı bulunamadı.<br><small>Başlıkların "1 Temmuz 2026 Çarşamba" biçiminde olduğundan emin olun.</small></div>';
+      return;
+    }
+
+    fillDateSelect(data.days);
+    renderMenu(data.days);
+
+    // Bugün varsa onu, yoksa bugünden sonraki ilk günü, o da yoksa ilk günü aç
+    var target = pickDefaultDay(data);
+    if (target) openDay(target, false);
+  }
+
+  function pickDefaultDay(data) {
+    var days = data.days, today = data.today;
+    for (var i = 0; i < days.length; i++) if (days[i].iso === today) return days[i].iso;
+    for (var j = 0; j < days.length; j++) if (days[j].iso >= today) return days[j].iso;
+    return days[0].iso;
+  }
+
+  function fillDateSelect(days) {
+    var sel = document.getElementById('dateSelect');
+    sel.innerHTML = '<option value="">— Tarih seçin —</option>';
+    days.forEach(function (d) {
+      var o = document.createElement('option');
+      o.value = d.iso;
+      o.textContent = d.day + ' ' + monthName(d.month) + ' · ' + d.weekday;
+      sel.appendChild(o);
+    });
+  }
+
+  function renderMenu(days) {
+    var menu = document.getElementById('menu');
+    menu.innerHTML = '';
+    days.forEach(function (d) {
+      menu.appendChild(dayNode(d));
+    });
+  }
+
+  function dayNode(d) {
+    var isToday = STATE.data && d.iso === STATE.data.today;
+
+    var wrap = document.createElement('section');
+    wrap.className = 'day';
+    wrap.id = 'day-' + d.iso;
+    wrap.setAttribute('data-iso', d.iso);
+
+    var head = document.createElement('button');
+    head.className = 'day-head';
+    head.type = 'button';
+    head.innerHTML =
+      '<span class="day-date"><span class="d">' + d.day + '</span><span class="m">' +
+        (MONTHS_SHORT[d.month - 1] || '') + '</span></span>' +
+      '<span class="day-title"><span class="wd">' + escapeHtml(d.weekday) +
+        (isToday ? '<span class="today-tag">BUGÜN</span>' : '') +
+        '</span><span class="sub">' + d.dishCount + ' çeşit yemek</span></span>' +
+      '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+    head.addEventListener('click', function () { toggleDay(d.iso); });
+
+    var body = document.createElement('div');
+    body.className = 'day-body';
+
+    if (d.dishes.length) {
+      var grid = document.createElement('div');
+      grid.className = 'dishes';
+      d.dishes.forEach(function (dish) { grid.appendChild(dishNode(dish)); });
+      body.appendChild(grid);
+    } else {
+      var e = document.createElement('div');
+      e.className = 'empty-day';
+      e.textContent = 'Bu gün için menü girilmemiş.';
+      body.appendChild(e);
+    }
+
+    wrap.appendChild(head);
+    wrap.appendChild(body);
+    return wrap;
+  }
+
+  function dishNode(dish) {
+    var el = document.createElement('div');
+    el.className = 'dish';
+    el.setAttribute('data-name', trLower(dish.pretty || dish.name));
+
+    var lock = 1;
+    el.innerHTML =
+      '<div class="thumb">' +
+        '<img loading="lazy" referrerpolicy="no-referrer" ' +
+             'data-emoji="' + escapeHtml(dish.emoji || '🍽️') + '" ' +
+             'data-stage="0" ' +
+             'src="' + escapeHtml(dish.imageUrl) + '" ' +
+             'alt="' + escapeHtml(dish.pretty || dish.name) + '" ' +
+             'onerror="imgFallback(this)">' +
+        '<span class="cat">' + escapeHtml(dish.emoji + ' ' + dish.category) + '</span>' +
+      '</div>' +
+      '<div class="name">' + escapeHtml(dish.pretty || dish.name) + '</div>';
+    return el;
+  }
+
+  /* Görsel yüklenemezse sırayla yedeklere geç, en sonda SVG yer tutucu göster */
+  function imgFallback(img) {
+    var stage = img.getAttribute('data-stage') || '0';
+    if (stage === '0') {
+      img.setAttribute('data-stage', '1');
+      img.src = 'https://loremflickr.com/320/240/food?lock=' + (1 + Math.floor(Math.random() * 50));
+      return;
+    }
+    img.onerror = null;
+    img.setAttribute('data-stage', '2');
+    img.src = placeholderSvg(img.getAttribute('data-emoji') || '🍽️');
+  }
+
+  function placeholderSvg(emoji) {
+    var svg =
+      "<svg xmlns='http://www.w3.org/2000/svg' width='320' height='240'>" +
+      "<rect width='100%' height='100%' fill='%23f3ece2'/>" +
+      "<text x='50%' y='52%' font-size='72' text-anchor='middle' dominant-baseline='middle'>" +
+      encodeURIComponent(emoji) + "</text></svg>";
+    return "data:image/svg+xml;charset=utf8," + svg;
+  }
+
+  /* -------------------------- ETKİLEŞİM -------------------------- */
+
+  function toggleDay(iso) {
+    var el = document.getElementById('day-' + iso);
+    if (!el) return;
+    if (el.classList.contains('open')) {
+      el.classList.remove('open');
+      STATE.openIso = null;
+    } else {
+      openDay(iso, true);
+    }
+  }
+
+  // scroll=true ise seçilen günü görünür alana kaydır
+  function openDay(iso, scroll) {
+    // Diğerlerini kapat (tek seferde bir gün açık - "aşağı doğru açılır" hissi)
+    var all = document.querySelectorAll('.day.open');
+    for (var i = 0; i < all.length; i++) all[i].classList.remove('open');
+
+    var el = document.getElementById('day-' + iso);
+    if (!el) return;
+    el.classList.add('open');
+    STATE.openIso = iso;
+
+    var sel = document.getElementById('dateSelect');
+    if (sel.value !== iso) sel.value = iso;
+
+    if (scroll) {
+      setTimeout(function () {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    }
+  }
+
+  function goToToday() {
+    if (!STATE.data) return;
+    var iso = pickDefaultDay(STATE.data);
+    openDay(iso, true);
+  }
+
+  /* Yemek arama: eşleşen kartları göster, günü otomatik aç */
+  function applySearch(q) {
+    q = trLower((q || '').trim());
+    var days = document.querySelectorAll('.day');
+    var anyGlobal = false;
+
+    days.forEach(function (day) {
+      var dishes = day.querySelectorAll('.dish');
+      var anyInDay = false;
+      dishes.forEach(function (dish) {
+        var match = !q || trLower(dish.getAttribute('data-name')).indexOf(q) !== -1;
+        dish.style.display = match ? '' : 'none';
+        if (match) anyInDay = true;
+      });
+
+      if (!q) {
+        day.style.display = '';
+      } else {
+        day.style.display = anyInDay ? '' : 'none';
+        if (anyInDay) { day.classList.add('open'); anyGlobal = true; }
+      }
+    });
+
+    // Arama temizlenince varsayılan güne dön
+    if (!q && STATE.data) {
+      var all = document.querySelectorAll('.day.open');
+      for (var i = 0; i < all.length; i++) all[i].classList.remove('open');
+      openDay(pickDefaultDay(STATE.data), false);
+    }
+
+    var menu = document.getElementById('menu');
+    var existing = document.getElementById('noresult');
+    if (q && !anyGlobal) {
+      if (!existing) {
+        var n = document.createElement('div');
+        n.id = 'noresult';
+        n.className = 'noresult';
+        n.textContent = '“' + q + '” için sonuç bulunamadı.';
+        menu.appendChild(n);
+      }
+    } else if (existing) {
+      existing.remove();
+    }
+  }
+
+  /* -------------------------- YARDIMCILAR -------------------------- */
+
+  function monthName(m) {
+    var names = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+    return names[m - 1] || '';
+  }
+
+  function trLower(s) {
+    return String(s == null ? '' : s).replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase();
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+</script>
