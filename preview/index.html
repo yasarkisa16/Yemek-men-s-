@@ -1,0 +1,265 @@
+<title>Temmuz Yemek Listesi — Önizleme</title>
+<style>
+  :root {
+    --bg: #fbf7f0;
+    --card: #ffffff;
+    --ink: #2a2320;
+    --muted: #8a7f76;
+    --brand: #d9541e;
+    --brand-dark: #b23f11;
+    --accent: #f4a23b;
+    --line: #ece3d8;
+    --shadow: 0 8px 30px rgba(60, 40, 20, 0.10);
+    --radius: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #191512; --card: #241e19; --ink: #f3ece4; --muted: #b3a79c;
+      --line: #362d25; --shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #191512; --card: #241e19; --ink: #f3ece4; --muted: #b3a79c;
+    --line: #362d25; --shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  :root[data-theme="light"] {
+    --bg: #fbf7f0; --card: #ffffff; --ink: #2a2320; --muted: #8a7f76;
+    --line: #ece3d8; --shadow: 0 8px 30px rgba(60,40,20,0.10);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { max-width: 1040px; margin: 0 auto; padding: 0 16px 60px; }
+
+  .note {
+    background: color-mix(in srgb, var(--accent) 16%, var(--bg));
+    border: 1px dashed color-mix(in srgb, var(--brand) 40%, var(--line));
+    color: var(--ink); border-radius: 12px;
+    padding: 10px 14px; font-size: 13px; margin: 14px 0 0; text-align: center;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
+    color: #fff; border-radius: 0 0 28px 28px; padding: 34px 22px 30px;
+    margin: 0 -16px 26px; box-shadow: var(--shadow); text-align: center;
+  }
+  .hero-inner { max-width: 720px; margin: 0 auto; }
+  .badge {
+    display: inline-block; background: rgba(255,255,255,.22); padding: 6px 14px;
+    border-radius: 999px; font-size: 13px; font-weight: 600; letter-spacing: .3px; margin-bottom: 12px;
+  }
+  .hero h1 { margin: 4px 0 6px; font-size: clamp(26px, 5vw, 40px); font-weight: 800; letter-spacing: -.5px; text-wrap: balance; }
+  .hero .subtitle { margin: 0 0 20px; opacity: .92; font-size: 15px; }
+  .controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .controls label { font-size: 14px; font-weight: 600; }
+  select#dateSelect {
+    appearance: none; -webkit-appearance: none;
+    background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23d9541e' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 12px center;
+    color: #2a2320; border: none; border-radius: 12px; padding: 11px 38px 11px 14px;
+    font-size: 15px; font-weight: 600; min-width: 240px; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  }
+  button#todayBtn {
+    background: rgba(255,255,255,.95); color: var(--brand-dark); border: none; border-radius: 12px;
+    padding: 11px 18px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  }
+  button#todayBtn:active { transform: scale(.96); }
+  input#search {
+    width: 100%; max-width: 420px; border: none; border-radius: 12px; padding: 11px 16px;
+    font-size: 15px; box-shadow: 0 4px 14px rgba(0,0,0,.10); outline: none; color: #2a2320;
+  }
+  input#search:focus-visible, select#dateSelect:focus-visible, button:focus-visible {
+    outline: 3px solid #fff; outline-offset: 2px;
+  }
+
+  .menu { display: flex; flex-direction: column; gap: 14px; }
+  .day {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; box-shadow: 0 2px 10px rgba(60,40,20,.05); transition: box-shadow .2s ease;
+  }
+  .day.open { box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--brand) 35%, var(--line)); }
+  .day-head {
+    display: flex; align-items: center; gap: 14px; width: 100%; background: none; border: none;
+    text-align: left; padding: 18px 20px; cursor: pointer; font-family: inherit; color: inherit;
+  }
+  .day-head:hover { background: color-mix(in srgb, var(--accent) 8%, var(--card)); }
+  .day-date {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 58px;
+    background: linear-gradient(135deg, var(--brand), var(--accent)); color: #fff; border-radius: 12px; padding: 8px 6px; line-height: 1.1;
+  }
+  .day-date .d { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .day-date .m { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; opacity: .95; }
+  .day-title { flex: 1; }
+  .day-title .wd { font-size: 17px; font-weight: 700; }
+  .day-title .sub { font-size: 13px; color: var(--muted); }
+  .chev { width: 26px; height: 26px; flex: none; color: var(--brand); transition: transform .25s ease; }
+  .day.open .chev { transform: rotate(180deg); }
+  .today-tag { background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; margin-left: 8px; }
+
+  .day-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+  .day.open .day-body { max-height: 4000px; }
+  .dishes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; padding: 4px 20px 22px; }
+  .dish { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; transition: transform .12s ease, box-shadow .12s ease; }
+  .dish:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+  .thumb { position: relative; aspect-ratio: 4 / 3; overflow: hidden; display: grid; place-items: center; }
+  .thumb .emoji { font-size: 54px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
+  .cat { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
+  .dish .name { padding: 10px 12px 12px; font-size: 14px; font-weight: 600; }
+
+  .foot { text-align: center; color: var(--muted); font-size: 12px; margin-top: 30px; }
+
+  @media (max-width: 480px) {
+    .day-head { padding: 14px; gap: 10px; }
+    .dishes { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); padding: 4px 14px 18px; }
+    select#dateSelect { min-width: 180px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="badge">🍽️ Firma Yemek Menüsü</span>
+      <h1>Temmuz Yemek Listesi</h1>
+      <p class="subtitle">Bir tarih seçin, günün menüsü aşağıda açılsın.</p>
+      <div class="controls">
+        <label for="dateSelect">Tarih:</label>
+        <select id="dateSelect"></select>
+        <button id="todayBtn" type="button">Bugün</button>
+      </div>
+      <input id="search" type="search" placeholder="Yemek ara… (ör. çorba, kebap, salata)" autocomplete="off">
+    </div>
+  </header>
+  <main id="menu" class="menu"></main>
+  <p class="note">Bu bir <strong>önizlemedir</strong>. Görsellerde kategori simgeleri gösteriliyor; canlı sitede her yemeğin yanında internetten gerçek fotoğraf görünür.</p>
+  <footer class="foot">Veriler Google E-Tablo'dan canlı çekilir · Örnek: 1–10 Temmuz 2026</footer>
+</div>
+
+<script>
+  // Ekran görüntüsündeki Temmuz verileri (örnek)
+  var RAW = {
+    "2026-07-01": ["EZOGELİN ÇORBA","İSKENDER KEBAP","MEVSİM TÜRLÜ","ARPA ŞEHRİYELİ PİRİNÇ PİLAVI","ISPANAKLI BÖREK","ÇİKOLATALI SPOONFUL","YOĞURT","AYRAN","HUMUS","HAVUÇ SALATA","DOM.GÖBEK SALATA","BİBERİYE TURŞU"],
+    "2026-07-02": ["YOĞURT ÇORBA","ETLİ NOHUT","EKŞİLİ BAMYA","SADE PİRİNÇ PİLAVI","SOSLU MAKARNA","SÜT HELVASI","CACIK","HERSE","SOĞAN SÖĞÜŞ","YEŞİL SALATA","KARIŞIK TURŞU"],
+    "2026-07-03": ["DÜĞÜN ÇORBA","SOĞUK ÇORBA","KARIŞIK MUSAKKA","YOĞURTLU SEMİZOTU","SEBZELİ BULGUR PİLAVI","PEYNİRLİ MAKARNA","AŞURE","YOĞURT","AYRAN","ÇİĞ KÖFTE","GÖBEK SALATA","SALATALIK TURŞU","MISIRLI HAVUÇ SALATASI"],
+    "2026-07-06": ["MERCİMEK ÇORBA","FIRIN KÖFTE","ZEYTİNYAĞLI TAZE FASULYE","PİRİNÇ PİLAVI","AYRAN","ÇOBAN SALATA"],
+    "2026-07-07": ["DÜĞÜN ÇORBA","ISPANAK & YOĞURT","TAVUK SOTE","BULGUR PİLAVI","YOĞURT","MEVSİM SALATA"],
+    "2026-07-08": ["TERBİYELİ ŞEHRİYE ÇORBA","SOĞUK ÇORBA","MANTAR SOSLU BİFTEK","SEBZELİ PİLAV","SÜTLAÇ","CACIK","YEŞİL SALATA"],
+    "2026-07-09": ["TAVUKSUYU ÇORBA","KURU FASULYE","PİRİNÇ PİLAVI","TURŞU","AYRAN","ROKA SALATA"],
+    "2026-07-10": ["SEBZE ÇORBA","FERAH SOĞUK ÇORBA","KASAP KÖFTE","ARPA ŞEHRİYELİ PİLAV","BAKLAVA","YOĞURT","KISIR"]
+  };
+
+  var MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  var MONTHS_SHORT = ['OCA','ŞUB','MAR','NİS','MAY','HAZ','TEM','AĞU','EYL','EKİ','KAS','ARA'];
+  var WD = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  var TODAY = '2026-07-08'; // önizleme için "bugün"
+
+  function trLower(s){ return String(s==null?'':s).replace(/İ/g,'i').replace(/I/g,'ı').toLowerCase(); }
+  function trUpperFirst(c){ return c==='i'?'İ':(c==='ı'?'I':c.toUpperCase()); }
+  function toTitleTr(s){ return trLower(s).split(/(\s+)/).map(function(w){ return w.trim()? trUpperFirst(w.charAt(0))+w.slice(1) : w; }).join(''); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function categorize(name){
+    var n = trLower(name);
+    var rules = [
+      { any:['çorba'], grad:['#e07b3c','#c94f1c'], emoji:'🍲', label:'Çorba' },
+      { any:['ayran','cacık','kefir'], grad:['#79b6d6','#4f8fb8'], emoji:'🥛', label:'İçecek' },
+      { any:['yoğurt'], grad:['#cfd6dd','#a7b0ba'], emoji:'🥣', label:'Yoğurt' },
+      { any:['turşu'], grad:['#8fb84f','#6a9433'], emoji:'🥒', label:'Turşu' },
+      { any:['salata','söğüş','kısır'], grad:['#7cbf59','#4f9b3a'], emoji:'🥗', label:'Salata' },
+      { any:['humus','haydari','ezme','meze'], grad:['#d9b56b','#bd923f'], emoji:'🫓', label:'Meze' },
+      { any:['börek','poğaça','pide','gözleme'], grad:['#e0a458','#c47e2b'], emoji:'🥟', label:'Hamur İşi' },
+      { any:['pilav','bulgur','şehriye'], grad:['#e6c887','#cba954'], emoji:'🍚', label:'Pilav' },
+      { any:['makarna','erişte','mantı'], grad:['#e8b96a','#cf9a3d'], emoji:'🍝', label:'Makarna' },
+      { any:['helva','aşure','sütlaç','baklava','tatlı','spoonful','revani','kadayıf','muhallebi'], grad:['#d98cae','#bd5f88'], emoji:'🍮', label:'Tatlı' },
+      { any:['kebap','köfte','iskender','döner','biftek','tavuk','etli','musakka','sote','kavurma'], grad:['#c9502a','#a13417'], emoji:'🍢', label:'Ana Yemek (Et)' },
+      { any:['nohut','fasulye','bamya','türlü','sebze','semizotu','ıspanak','dolma','sarma','mücver','pırasa','kabak','herse','bezelye'], grad:['#8aa84a','#5f8034'], emoji:'🥘', label:'Sebze Yemeği' },
+      { any:['ekmek'], grad:['#d7b483','#b98f52'], emoji:'🍞', label:'Ekmek' }
+    ];
+    for (var i=0;i<rules.length;i++) for (var j=0;j<rules[i].any.length;j++)
+      if (n.indexOf(rules[i].any[j])!==-1) return rules[i];
+    return { grad:['#c99a5a','#a9793a'], emoji:'🍽️', label:'Yemek' };
+  }
+
+  var DAYS = Object.keys(RAW).sort().map(function(iso){
+    var p = iso.split('-').map(Number), d = new Date(p[0], p[1]-1, p[2]);
+    return {
+      iso: iso, day: p[2], month: p[1], weekday: WD[d.getDay()],
+      dishes: RAW[iso].map(function(name){ var c = categorize(name); return { name:name, pretty:toTitleTr(name), emoji:c.emoji, label:c.label, grad:c.grad }; })
+    };
+  });
+
+  var openIso = null;
+
+  function build(){
+    var sel = document.getElementById('dateSelect');
+    sel.innerHTML = '<option value="">— Tarih seçin —</option>' + DAYS.map(function(d){
+      return '<option value="'+d.iso+'">'+d.day+' '+MONTHS[d.month-1]+' · '+d.weekday+'</option>';
+    }).join('');
+    sel.addEventListener('change', function(){ if(this.value) openDay(this.value, true); });
+    document.getElementById('todayBtn').addEventListener('click', function(){ openDay(pickDefault(), true); });
+    document.getElementById('search').addEventListener('input', function(){ applySearch(this.value); });
+
+    var menu = document.getElementById('menu');
+    menu.innerHTML = DAYS.map(function(d){
+      var isToday = d.iso===TODAY;
+      var cards = d.dishes.map(function(dish){
+        return '<div class="dish" data-name="'+esc(trLower(dish.pretty))+'">'+
+          '<div class="thumb" style="background:linear-gradient(135deg,'+dish.grad[0]+','+dish.grad[1]+')">'+
+            '<span class="emoji">'+dish.emoji+'</span>'+
+            '<span class="cat">'+dish.emoji+' '+esc(dish.label)+'</span>'+
+          '</div><div class="name">'+esc(dish.pretty)+'</div></div>';
+      }).join('');
+      return '<section class="day" id="day-'+d.iso+'">'+
+        '<button class="day-head" type="button" data-iso="'+d.iso+'">'+
+          '<span class="day-date"><span class="d">'+d.day+'</span><span class="m">'+MONTHS_SHORT[d.month-1]+'</span></span>'+
+          '<span class="day-title"><span class="wd">'+esc(d.weekday)+(isToday?'<span class="today-tag">BUGÜN</span>':'')+'</span>'+
+          '<span class="sub">'+d.dishes.length+' çeşit yemek</span></span>'+
+          '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'+
+        '</button>'+
+        '<div class="day-body"><div class="dishes">'+cards+'</div></div>'+
+      '</section>';
+    }).join('');
+
+    Array.prototype.forEach.call(document.querySelectorAll('.day-head'), function(h){
+      h.addEventListener('click', function(){ toggleDay(h.getAttribute('data-iso')); });
+    });
+  }
+
+  function pickDefault(){
+    for (var i=0;i<DAYS.length;i++) if (DAYS[i].iso===TODAY) return DAYS[i].iso;
+    for (var j=0;j<DAYS.length;j++) if (DAYS[j].iso>=TODAY) return DAYS[j].iso;
+    return DAYS[0].iso;
+  }
+  function toggleDay(iso){
+    var el = document.getElementById('day-'+iso);
+    if (el.classList.contains('open')) { el.classList.remove('open'); openIso=null; }
+    else openDay(iso, true);
+  }
+  function openDay(iso, scroll){
+    Array.prototype.forEach.call(document.querySelectorAll('.day.open'), function(e){ e.classList.remove('open'); });
+    var el = document.getElementById('day-'+iso); if(!el) return;
+    el.classList.add('open'); openIso = iso;
+    var sel = document.getElementById('dateSelect'); if (sel.value!==iso) sel.value = iso;
+    if (scroll) setTimeout(function(){ el.scrollIntoView({behavior:'smooth', block:'start'}); }, 60);
+  }
+  function applySearch(q){
+    q = trLower((q||'').trim());
+    Array.prototype.forEach.call(document.querySelectorAll('.day'), function(day){
+      var any = false;
+      Array.prototype.forEach.call(day.querySelectorAll('.dish'), function(dish){
+        var m = !q || dish.getAttribute('data-name').indexOf(q)!==-1;
+        dish.style.display = m ? '' : 'none'; if (m) any = true;
+      });
+      if (!q) day.style.display='';
+      else { day.style.display = any?'':'none'; if(any) day.classList.add('open'); }
+    });
+    if (!q) { Array.prototype.forEach.call(document.querySelectorAll('.day.open'), function(e){ e.classList.remove('open'); }); openDay(pickDefault(), false); }
+  }
+
+  build();
+  openDay(pickDefault(), false);
+</script>
