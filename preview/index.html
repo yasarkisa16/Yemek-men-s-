@@ -111,6 +111,9 @@
   .dish:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
   .thumb { position: relative; aspect-ratio: 4 / 3; overflow: hidden; display: grid; place-items: center; }
   .thumb .emoji { font-size: 54px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
+  .thumb .photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .thumb.has-photo { background: #eef1ec !important; }
+  .thumb.has-photo .emoji { display: none; }
   .cat { position: absolute; top: 8px; left: 8px; background: rgba(29,36,51,.78); color: #fff; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
   .dish .name { padding: 10px 12px 12px; font-size: 14px; font-weight: 600; }
 
@@ -139,7 +142,7 @@
     </div>
   </header>
   <main id="menu" class="menu"></main>
-  <p class="note">Bu bir <strong>önizlemedir</strong>. Görsellerde kategori simgeleri gösteriliyor; canlı sitede her yemeğin yanında <strong>internetten otomatik bulunan gerçek fotoğraf</strong> görünür.</p>
+  <p class="note">Her yemeğin fotoğrafı <strong>Türkçe Wikipedia'dan otomatik</strong> yüklenir. Bu önizleme penceresi güvenlik nedeniyle dış görselleri engellerse kategori simgeleri görünür; <strong>yayınlanan sitede (ve bu dosyayı tarayıcıda açtığınızda) gerçek fotoğraflar</strong> gelir.</p>
   <footer class="foot">Veriler Google E-Tablo'dan canlı çekilir · Örnek: 1–10 Temmuz 2026</footer>
 </div>
 
@@ -209,7 +212,7 @@
     menu.innerHTML = DAYS.map(function(d){
       var isToday = d.iso===TODAY;
       var cards = d.dishes.map(function(dish){
-        return '<div class="dish" data-name="'+esc(trLower(dish.pretty))+'">'+
+        return '<div class="dish" data-name="'+esc(trLower(dish.pretty))+'" data-q="'+esc(cleanQuery(dish.name))+'">'+
           '<div class="thumb" style="background:linear-gradient(135deg,'+dish.grad[0]+','+dish.grad[1]+')">'+
             '<span class="emoji">'+dish.emoji+'</span>'+
             '<span class="cat">'+dish.emoji+' '+esc(dish.label)+'</span>'+
@@ -229,6 +232,35 @@
     Array.prototype.forEach.call(document.querySelectorAll('.day-head'), function(h){
       h.addEventListener('click', function(){ toggleDay(h.getAttribute('data-iso')); });
     });
+
+    // Her yemek için gerçek fotoğrafı Türkçe Wikipedia'dan canlı yükle
+    // (yayınlanan sitede ve bu dosyayı tarayıcıda açtığınızda çalışır; kısıtlı
+    //  önizleme penceresinde engellenirse kategori simgesi kalır).
+    Array.prototype.forEach.call(document.querySelectorAll('.dish'), function(el){
+      loadPhoto(el, el.getAttribute('data-q'));
+    });
+  }
+
+  function cleanQuery(name){ return String(name).replace(/&/g,' ').replace(/\./g,' ').replace(/\s+/g,' ').trim(); }
+
+  function loadPhoto(dishEl, query){
+    if (!query || !window.fetch) return;
+    var api = 'https://tr.wikipedia.org/w/api.php?action=query&format=json&origin=*'+
+      '&generator=search&gsrsearch='+encodeURIComponent(query)+'&gsrlimit=1&gsrnamespace=0'+
+      '&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1';
+    fetch(api).then(function(r){ return r.json(); }).then(function(d){
+      var pages = d && d.query && d.query.pages; if(!pages) return;
+      var src=''; for(var k in pages){ var p=pages[k]; if(p.thumbnail&&p.thumbnail.source){ src=p.thumbnail.source; break; } }
+      if(!src) return;
+      var img = new Image();
+      img.onload = function(){
+        var t = dishEl.querySelector('.thumb'); if(!t) return;
+        img.className = 'photo';
+        t.insertBefore(img, t.firstChild);
+        t.classList.add('has-photo');
+      };
+      img.src = src;
+    }).catch(function(){});
   }
 
   function pickDefault(){

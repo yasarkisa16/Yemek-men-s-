@@ -91,16 +91,30 @@ Buraya eklemediğiniz yemekler için görsel, adına göre otomatik bulunur.
 
 ---
 
-## 🖼️ Görseller nasıl geliyor?
+## 🖼️ Görseller nasıl geliyor? (otomatik)
 
-Her yemeğin adı bir kategoriye ayrılır (çorba, kebap, pilav, salata, tatlı, turşu...).
-Kategoriye uygun anahtar kelimeyle **loremflickr.com** üzerinden gerçek bir yemek
-fotoğrafı çekilir. `?lock` sayesinde aynı yemek her zaman **aynı** fotoğrafı gösterir,
-her açılışta değişmez. Fotoğraf yüklenemezse otomatik olarak zarif bir emoji yer
-tutucuya düşer (kırık görsel görünmez).
+Her yemeğin fotoğrafı **internetten otomatik** bulunur. Sıralama şöyledir:
 
-İnternetten fotoğraf yerine **tamamen kendi görsellerinizi** kullanmak isterseniz
-yukarıdaki `IMAGE_OVERRIDES` yeterlidir.
+1. **IMAGE_OVERRIDES** — o yemek için elle link yazdıysanız o kullanılır.
+2. **Türkçe Wikipedia** — yemeğin adı Wikipedia'da aranıp o yemeğin **gerçek
+   fotoğrafı** getirilir (ör. `İSKENDER KEBAP` → İskender fotoğrafı,
+   `AŞURE` → aşure fotoğrafı). Sonuçlar 6 saat önbelleğe alınır, hızlıdır.
+3. **loremflickr (yedek)** — Wikipedia'da fotoğraf yoksa, yemeğin kategorisine
+   (çorba/kebap/pilav/salata/tatlı…) uygun temsili bir fotoğraf gösterilir.
+4. **Emoji yer tutucu** — hiçbiri yüklenmezse kırık görsel yerine şık bir simge.
+
+> Bu sayede menüdeki **tüm yemekler** — şu an göremediklerim ve gelecek aylarda
+> ekleyecekleriniz dahil — kendi fotoğrafını otomatik alır. Elle tek tek liste
+> tutmanıza gerek yoktur.
+
+Bir yemeğin otomatik fotoğrafı yanlış/alakasız çıkarsa, sadece o yemeği
+`CONFIG.IMAGE_OVERRIDES`'a ekleyip doğru linki verin — gerisi otomatik kalır.
+Wikipedia aramasını tümüyle kapatmak isterseniz `USE_WIKIPEDIA_IMAGES: false`
+yapın (o zaman yalnızca kategoriye göre temsili fotoğraflar kullanılır).
+
+> Not: Bu özellik, yayınlanan sitede Google'ın sunucularında çalışır ve internete
+> erişir. (Yemek fotoğrafları ziyaretçinin tarayıcısında `wikipedia.org` /
+> `wikimedia.org` üzerinden yüklenir.)
 
 ---
 
