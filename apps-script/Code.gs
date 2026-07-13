@@ -26,7 +26,7 @@ var CONFIG = {
   PAGE_TITLE: 'Temmuz Yemek Listesi',
 
   // Üstte görünen firma / alt başlık
-  COMPANY_NAME: 'Firma Yemek Menüsü',
+  COMPANY_NAME: 'Valeo',
 
   // Menü verisi kaç dakika önbellekte tutulsun? (hız için). 0 = kapalı.
   CACHE_MINUTES: 30,
