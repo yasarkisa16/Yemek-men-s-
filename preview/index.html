@@ -12,7 +12,7 @@
 
   * { box-sizing:border-box; }
   body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased; }
-  .app { max-width:1040px; margin:0 auto; padding:0 16px 60px; }
+  .app { max-width:1040px; margin:0 auto; padding:0 16px 90px; }
 
   .hero { position:relative; background:linear-gradient(135deg,#1d2433 0%,#2a3346 55%,#1d2433 100%); color:#fff; border-radius:0 0 28px 28px; padding:34px 22px 30px; margin:0 -16px 26px; box-shadow:var(--shadow); text-align:center; overflow:hidden; }
   .hero::before { content:""; position:absolute; top:0; left:0; right:0; height:4px; background:var(--brand); }
@@ -48,14 +48,30 @@
   .navbtn[disabled] { opacity:.35; cursor:not-allowed; }
 
   .dishes { display:flex; flex-direction:column; gap:10px; padding:16px 18px 20px; }
-  .dish { display:flex; align-items:center; gap:14px; padding:10px 12px; background:var(--card); border:1px solid var(--line); border-radius:14px; transition:transform .1s ease, box-shadow .1s ease, border-color .1s ease; }
+  .dish { display:flex; align-items:center; gap:14px; padding:10px 12px; background:var(--card); border:1px solid var(--line); border-radius:14px; cursor:pointer; transition:transform .1s ease, box-shadow .1s ease, border-color .1s ease, opacity .12s ease; }
   .dish:hover { transform:translateY(-1px); box-shadow:var(--shadow); border-color:color-mix(in srgb, var(--brand) 35%, var(--line)); }
+  .dish .tick { width:22px; height:22px; flex:none; border:2px solid color-mix(in srgb, var(--brand) 40%, var(--line)); border-radius:7px; display:grid; place-items:center; transition:background .12s ease, border-color .12s ease; }
+  .dish.selected { border-color:var(--brand); background:color-mix(in srgb, var(--brand) 9%, var(--card)); }
+  .dish.selected .tick { background:var(--brand); border-color:var(--brand); }
+  .dish.selected .tick::after { content:"✓"; font-size:14px; font-weight:900; color:var(--dark); line-height:1; }
+  .dishes.has-selection .dish:not(.selected) { opacity:.42; }
+  .dishes.has-selection .dish:not(.selected):hover { opacity:.85; }
+  .dish.plain { cursor:default; }
   .dish .icon { width:52px; height:52px; flex:none; border-radius:13px; display:grid; place-items:center; font-size:27px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.28), 0 2px 6px rgba(29,36,51,.12); }
   .dish .info { flex:1; display:flex; flex-direction:column; min-width:0; }
   .dish .dname { font-size:15px; font-weight:700; color:var(--ink); }
   .dish .dcat { font-size:12px; color:var(--muted); }
   .dish .kcal { flex:none; display:inline-flex; align-items:baseline; gap:3px; font-size:15px; font-weight:800; color:var(--brand-600); background:color-mix(in srgb, var(--brand) 15%, var(--card)); border:1px solid color-mix(in srgb, var(--brand) 35%, var(--line)); padding:6px 12px; border-radius:999px; font-variant-numeric:tabular-nums; }
   .dish .kcal small { font-size:10px; font-weight:700; color:var(--muted); }
+
+  .plate-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 20px; background:linear-gradient(135deg,#1d2433,#2a3346); color:#fff; }
+  .plate-bar.empty { background:var(--card); border-top:1px dashed var(--line); color:var(--muted); justify-content:center; text-align:center; }
+  .plate-bar .pb-left { display:flex; flex-direction:column; gap:2px; }
+  .plate-bar .pb-hint { font-size:13px; }
+  .plate-bar .pb-n { font-weight:800; font-size:14px; display:block; }
+  .plate-bar .pb-macros { font-size:12px; opacity:.82; }
+  .plate-bar .pb-kcal { font-size:24px; font-weight:800; color:var(--brand); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .plate-bar .pb-kcal small { font-size:11px; color:rgba(255,255,255,.7); font-weight:700; margin-left:2px; }
   .noresult { text-align:center; padding:40px 20px; color:var(--muted); }
 
   .foot { text-align:center; color:var(--muted); font-size:12px; margin-top:30px; }
@@ -65,28 +81,25 @@
   /* Diyetisyen asistan */
   .diet-fab { position:fixed; right:18px; bottom:18px; z-index:50; display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#82e600,#6cc400); color:var(--dark); border:none; border-radius:999px; padding:13px 20px; font-size:15px; font-weight:800; font-family:inherit; cursor:pointer; box-shadow:0 10px 26px rgba(29,36,51,.30); }
   .diet-fab:hover{ filter:brightness(1.05); } .diet-fab:active{ transform:scale(.96); }
-  .diet-overlay { position:fixed; inset:0; background:rgba(15,20,30,.5); z-index:60; }
-  .diet-panel { position:fixed; top:0; right:0; bottom:0; z-index:70; width:410px; max-width:92vw; background:var(--bg); box-shadow:-14px 0 44px rgba(0,0,0,.32); display:flex; flex-direction:column; animation:dietIn .25s ease; }
+  .diet-overlay { position:fixed; inset:0; background:rgba(15,20,30,.45); z-index:60; backdrop-filter:blur(2px); }
+  .diet-overlay[hidden] { display:none; }
+  .diet-panel { position:fixed; top:0; right:0; bottom:0; z-index:70; width:372px; max-width:92vw; background:var(--bg); box-shadow:-14px 0 44px rgba(0,0,0,.32); display:flex; flex-direction:column; animation:dietIn .25s ease; }
+  .diet-panel[hidden] { display:none; }
   @keyframes dietIn { from{transform:translateX(24px);opacity:.3;} to{transform:none;opacity:1;} }
-  .diet-head { display:flex; align-items:center; gap:12px; padding:16px 18px; background:linear-gradient(135deg,#1d2433,#2a3346); color:#fff; flex:none; }
-  .diet-avatar { width:42px; height:42px; border-radius:50%; background:var(--brand); color:var(--dark); display:grid; place-items:center; font-size:22px; flex:none; }
-  .diet-name { font-weight:800; font-size:16px; } .diet-status { font-size:12px; opacity:.82; }
-  .diet-close { margin-left:auto; background:rgba(255,255,255,.16); color:#fff; border:none; width:34px; height:34px; border-radius:9px; font-size:15px; cursor:pointer; }
-  .diet-body { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
-  .diet-actions { padding:12px 16px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:8px; background:var(--card); }
-  .msg { max-width:90%; padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.45; }
+  .diet-head { display:flex; align-items:center; gap:11px; padding:13px 16px; background:linear-gradient(135deg,#1d2433,#2a3346); color:#fff; flex:none; }
+  .diet-avatar { width:36px; height:36px; border-radius:50%; background:var(--brand); color:var(--dark); display:grid; place-items:center; font-size:19px; flex:none; }
+  .diet-name { font-weight:800; font-size:15px; } .diet-status { font-size:11.5px; opacity:.8; }
+  .diet-close { margin-left:auto; background:rgba(255,255,255,.16); color:#fff; border:none; width:32px; height:32px; border-radius:9px; font-size:14px; cursor:pointer; }
+  .diet-body { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:9px; }
+  .diet-actions { padding:12px 14px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:7px; background:var(--card); }
+  .msg { max-width:90%; padding:9px 13px; border-radius:15px; font-size:13.5px; line-height:1.45; }
   .msg.bot { align-self:flex-start; background:var(--card); border:1px solid var(--line); border-bottom-left-radius:5px; color:var(--ink); }
   .msg.user { align-self:flex-end; background:var(--brand); color:var(--dark); font-weight:600; border-bottom-right-radius:5px; }
   .opt { background:var(--card); color:var(--ink); border:1.5px solid color-mix(in srgb, var(--brand) 45%, var(--line)); border-radius:999px; padding:9px 14px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; }
   .opt:hover { background:color-mix(in srgb, var(--brand) 14%, var(--card)); }
   .opt.sel { background:var(--brand); color:var(--dark); border-color:var(--brand); }
   .opt.cont { background:var(--dark); color:#fff; border-color:var(--dark); margin-left:auto; }
-  .rec { display:flex; flex-direction:column; gap:4px; }
-  .rec-item { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; padding:7px 0; border-bottom:1px dashed var(--line); }
-  .rec-item .ri-emoji { font-size:20px; } .rec-item .ri-name { flex:1; font-weight:700; font-size:13.5px; }
-  .rec-item .ri-kcal { font-size:12px; font-weight:800; color:var(--brand-600); }
-  .rec-item .ri-macros { width:100%; padding-left:28px; font-size:11.5px; color:var(--muted); }
-  .rec-total { font-weight:800; font-size:13px; color:var(--ink); background:color-mix(in srgb, var(--brand) 15%, var(--card)); border:1px solid color-mix(in srgb, var(--brand) 30%, var(--line)); border-radius:10px; padding:9px 11px; margin-top:6px; }
+  .rec-total { font-weight:800; font-size:13px; color:var(--ink); background:color-mix(in srgb, var(--brand) 15%, var(--card)); border:1px solid color-mix(in srgb, var(--brand) 30%, var(--line)); border-radius:10px; padding:9px 11px; }
   .rec-notes .rn-title { font-weight:800; margin-bottom:5px; } .rec-notes ul { margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; } .rec-notes li { font-size:13px; }
   @media (max-width:480px){ .diet-panel{width:100vw;max-width:100vw;} .diet-fab span{display:none;} .diet-fab{padding:15px;font-size:22px;} }
 </style>
@@ -171,7 +184,7 @@
     return m[tag]||['#c99a5a','#a9793a'];
   }
 
-  var CATEGORY_KCAL = { soup:120, kebab:360, rice:270, pasta:320, pastry:300, dessert:340, salad:70, pickles:20, vegetable:170, ayran:70, yogurt:90, hummus:170, bread:90, 'turkish-food':220 };
+  var CAT_KCAL = { soup:120,kebab:360,rice:270,pasta:320,pastry:300,dessert:340,salad:70,pickles:20,vegetable:170,ayran:70,yogurt:90,hummus:170,bread:90,'turkish-food':220 };
   var KCAL_KEYWORDS = [
     ['mercimek çorba',150],['ezogelin',140],['düğün çorba',160],['yoğurt çorba',150],['yayla',150],['tavuksuyu',90],['tavuk suyu',90],['terbiyeli',140],['domates çorba',130],['şehriye çorba',130],['sebze çorba',100],['soğuk çorba',90],['çorba',120],
     ['baklava',380],['künefe',450],['kadayıf',380],['tulumba',360],['sütlaç',220],['muhallebi',200],['kazandibi',260],['aşure',250],['dondurma',200],['revani',340],['irmik helva',360],['helva',360],['profiterol',380],['trileçe',330],['kemalpaşa',340],['spoonful',300],['çikolatalı',320],['tatlı',320],
@@ -180,11 +193,9 @@
     ['mantı',350],['makarna',320],['erişte',300],['lazanya',380],['su böreği',320],['börek',320],['poğaça',260],['gözleme',300],['pide',350],['bulgur',250],['pilav',270],
     ['ayran',60],['cacık',90],['kefir',70],['şıra',120],['yoğurt',90],['humus',180],['haydari',150],['ezme',90],['söğüş',30],['salata',60],['turşu',20],['herse',250],['keşkek',260],['kısır',180]
   ];
-  function calorieFor(name, tag){
-    var n=trLower(name);
-    for(var i=0;i<KCAL_KEYWORDS.length;i++){ if(n.indexOf(KCAL_KEYWORDS[i][0])!==-1) return KCAL_KEYWORDS[i][1]; }
-    return CATEGORY_KCAL[tag]||200;
-  }
+  function calorieFor(name, tag){ var n=trLower(name); for(var i=0;i<KCAL_KEYWORDS.length;i++){ if(n.indexOf(KCAL_KEYWORDS[i][0])!==-1) return KCAL_KEYWORDS[i][1]; } return CAT_KCAL[tag]||200; }
+  var MACRO_RATIO = { soup:[20,55,25],kebab:[34,10,56],rice:[8,78,14],pasta:[13,70,17],pastry:[12,42,46],dessert:[6,62,32],salad:[14,48,38],pickles:[15,75,10],vegetable:[14,54,32],ayran:[22,34,44],yogurt:[24,30,46],hummus:[12,40,48],bread:[13,80,7],'turkish-food':[15,50,35] };
+  function macrosOf(k,tag){ var r=MACRO_RATIO[tag]||MACRO_RATIO['turkish-food']; return {p:Math.round(k*r[0]/100/4),c:Math.round(k*r[1]/100/4),f:Math.round(k*r[2]/100/9)}; }
 
   var DAYS = Object.keys(RAW).sort().map(function(iso){
     var p=iso.split('-').map(Number), dt=new Date(p[0],p[1]-1,p[2]);
@@ -201,13 +212,31 @@
 
   function pickDefault(){ for(var i=0;i<DAYS.length;i++) if(DAYS[i].iso===TODAY) return DAYS[i].iso; for(var j=0;j<DAYS.length;j++) if(DAYS[j].iso>=TODAY) return DAYS[j].iso; return DAYS[0].iso; }
 
-  function dishHtml(dish){
+  function dishHtml(dish, i, plain){
     var g=gradientFor(dish.tag);
-    return '<div class="dish">'+
+    var k=(dish.kcal!=null?dish.kcal:(CAT_KCAL[dish.tag]||200));
+    var m=macrosOf(k,dish.tag);
+    var tick = plain ? '' : '<span class="tick" aria-hidden="true"></span>';
+    var attrs = plain ? '' : (' data-i="'+i+'" data-kcal="'+k+'" data-p="'+m.p+'" data-c="'+m.c+'" data-f="'+m.f+'" role="button" tabindex="0" aria-pressed="false"');
+    return '<div class="dish'+(plain?' plain':'')+'"'+attrs+'>'+tick+
       '<span class="icon" style="background:linear-gradient(135deg,'+g[0]+','+g[1]+')">'+dish.emoji+'</span>'+
       '<div class="info"><span class="dname">'+esc(dish.pretty)+'</span><span class="dcat">'+esc(dish.category)+'</span></div>'+
-      '<span class="kcal" title="Yaklaşık kalori (porsiyon başına)">≈ '+dish.kcal+'<small>kcal</small></span>'+
-    '</div>';
+      '<span class="kcal">≈ '+k+'<small>kcal</small></span></div>';
+  }
+  function toggleDishRow(row){ var on=row.classList.toggle('selected'); row.setAttribute('aria-pressed',on?'true':'false'); recomputePlate(); }
+  function applyRecommendation(idxList){
+    var section=document.querySelector('#menu .day'); if(!section) return;
+    Array.prototype.forEach.call(section.querySelectorAll('.dish'),function(row){ var on=idxList.indexOf(+row.getAttribute('data-i'))!==-1; row.classList.toggle('selected',on); row.setAttribute('aria-pressed',on?'true':'false'); });
+    recomputePlate();
+  }
+  function recomputePlate(){
+    var section=document.querySelector('#menu .day'); if(!section) return;
+    var wrap=section.querySelector('.dishes'), bar=section.querySelector('#plateBar'); if(!wrap||!bar) return;
+    var sel=section.querySelectorAll('.dish.selected'); wrap.classList.toggle('has-selection', sel.length>0);
+    var tot={n:0,kcal:0,p:0,c:0,f:0};
+    Array.prototype.forEach.call(sel,function(r){ tot.n++; tot.kcal+=+r.getAttribute('data-kcal'); tot.p+=+r.getAttribute('data-p'); tot.c+=+r.getAttribute('data-c'); tot.f+=+r.getAttribute('data-f'); });
+    if(tot.n===0){ bar.className='plate-bar empty'; bar.innerHTML='<span class="pb-hint">Bir yemeğe dokunarak tabağını oluştur ya da <b>🥗 Diyetisyen</b>\'e sor.</span>'; }
+    else { bar.className='plate-bar'; bar.innerHTML='<div class="pb-left"><span class="pb-n">'+tot.n+' yemek seçildi</span><span class="pb-macros">Protein '+tot.p+' g · Karb. '+tot.c+' g · Yağ '+tot.f+' g</span></div><div class="pb-kcal">≈ '+tot.kcal+'<small>kcal</small></div>'; }
   }
 
   function showDay(iso, scroll){
@@ -221,9 +250,13 @@
         '<div class="day-title"><span class="wd">'+esc(d.weekday)+(isToday?'<span class="today-tag">BUGÜN</span>':'')+'</span><span class="sub">'+d.day+' '+MONTHS[d.month-1]+' · '+d.dishes.length+' çeşit yemek</span></div>'+
         '<div class="daynav"><button class="navbtn" id="prevDay" '+(hasPrev?'':'disabled')+'>‹</button><button class="navbtn" id="nextDay" '+(hasNext?'':'disabled')+'>›</button></div>'+
       '</div>'+
-      '<div class="dishes">'+d.dishes.map(dishHtml).join('')+'</div></section>';
+      '<div class="dishes">'+d.dishes.map(function(x,di){return dishHtml(x,di);}).join('')+'</div>'+
+      '<div class="plate-bar empty" id="plateBar"></div></section>';
     if(hasPrev) document.getElementById('prevDay').addEventListener('click',function(){ showDay(DAYS[i-1].iso,true); });
     if(hasNext) document.getElementById('nextDay').addEventListener('click',function(){ showDay(DAYS[i+1].iso,true); });
+    var section=document.querySelector('#menu .day');
+    Array.prototype.forEach.call(section.querySelectorAll('.dish'),function(row){ row.addEventListener('click',function(){ toggleDishRow(row); }); row.addEventListener('keydown',function(e){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); toggleDishRow(row); } }); });
+    recomputePlate();
     if(scroll) window.scrollTo({top:0,behavior:'smooth'});
   }
 
@@ -234,7 +267,7 @@
     DAYS.forEach(function(d){
       var m=d.dishes.filter(function(dish){ return trLower(dish.pretty).indexOf(q)!==-1; });
       if(!m.length) return;
-      blocks.push('<section class="day"><div class="day-head"><span class="day-date"><span class="d">'+d.day+'</span><span class="m">'+MONTHS_SHORT[d.month-1]+'</span></span><div class="day-title"><span class="wd">'+esc(d.weekday)+'</span><span class="sub">'+d.day+' '+MONTHS[d.month-1]+'</span></div></div><div class="dishes">'+m.map(dishHtml).join('')+'</div></section>');
+      blocks.push('<section class="day"><div class="day-head"><span class="day-date"><span class="d">'+d.day+'</span><span class="m">'+MONTHS_SHORT[d.month-1]+'</span></span><div class="day-title"><span class="wd">'+esc(d.weekday)+'</span><span class="sub">'+d.day+' '+MONTHS[d.month-1]+'</span></div></div><div class="dishes">'+m.map(function(x){return dishHtml(x,0,true);}).join('')+'</div></section>');
     });
     document.getElementById('menu').innerHTML=blocks.length?('<div class="search-head">“'+esc(q)+'” için '+blocks.length+' gün bulundu</div>'+blocks.join('')):('<div class="noresult">“'+esc(q)+'” için sonuç bulunamadı.</div>');
   }
@@ -245,9 +278,6 @@
   var ANS = { health: [], goal: null };
   var GOAL_LABEL = { lose:'Zayıflama', gain:'Kilo alma', muscle:'Kas yapma', maintain:'Kilo koruma' };
   var HEALTH_LABEL = { yok:'Sağlık sorunum yok', seker:'Şeker (diyabet)', kolesterol:'Kolesterol', tansiyon:'Tansiyon' };
-  var CAT_KCAL = { soup:120,kebab:360,rice:270,pasta:320,pastry:300,dessert:340,salad:70,pickles:20,vegetable:170,ayran:70,yogurt:90,hummus:170,bread:90,'turkish-food':220 };
-  var MACRO_RATIO = { soup:[20,55,25],kebab:[34,10,56],rice:[8,78,14],pasta:[13,70,17],pastry:[12,42,46],dessert:[6,62,32],salad:[14,48,38],pickles:[15,75,10],vegetable:[14,54,32],ayran:[22,34,44],yogurt:[24,30,46],hummus:[12,40,48],bread:[13,80,7],'turkish-food':[15,50,35] };
-  function macrosOf(k,tag){ var r=MACRO_RATIO[tag]||MACRO_RATIO['turkish-food']; return {p:Math.round(k*r[0]/100/4),c:Math.round(k*r[1]/100/4),f:Math.round(k*r[2]/100/9)}; }
 
   function initDietitian(){ document.getElementById('dietFab').addEventListener('click',openDiet); document.getElementById('dietClose').addEventListener('click',closeDiet); document.getElementById('dietOverlay').addEventListener('click',closeDiet); }
   function openDiet(){ document.getElementById('dietOverlay').hidden=false; document.getElementById('dietPanel').hidden=false; document.body.style.overflow='hidden'; dietStart(); }
@@ -278,7 +308,7 @@
 
   function recommend(){
     var d=DAYS[IDX[CUR]]||DAYS[IDX[pickDefault()]]; var goal=ANS.goal, health=ANS.health;
-    var list=d.dishes.map(function(x){ var k=(x.kcal!=null?x.kcal:(CAT_KCAL[x.tag]||200)); var m=macrosOf(k,x.tag); return {name:x.pretty,emoji:x.emoji,tag:x.tag,kcal:k,p:m.p,c:m.c,f:m.f,raw:trLower(x.name)}; });
+    var list=d.dishes.map(function(x,oi){ var k=(x.kcal!=null?x.kcal:(CAT_KCAL[x.tag]||200)); var m=macrosOf(k,x.tag); return {oi:oi,name:x.pretty,emoji:x.emoji,tag:x.tag,kcal:k,p:m.p,c:m.c,f:m.f,raw:trLower(x.name)}; });
     function byTags(t){ return list.filter(function(x){return t.indexOf(x.tag)!==-1;}); }
     var soups=byTags(['soup']),mains=byTags(['kebab']),starch=byTags(['rice','pasta']),vegs=byTags(['vegetable']),salads=byTags(['salad']),mezes=byTags(['hummus']),pickles=byTags(['pickles']),drinks=byTags(['ayran','yogurt']),desserts=byTags(['dessert']),pastry=byTags(['pastry']);
     var plate=[],notes=[]; function add(x){ if(x&&plate.indexOf(x)===-1) plate.push(x); }
@@ -297,13 +327,15 @@
     if(goal==='lose') notes.push('🔥 Zayıflama: önce çorba + salata, sonra protein; şekerli içecek yerine su/ayran.');
     if(goal==='gain') notes.push('⚖️ Kilo alma: porsiyonları biraz büyütün, araya sağlıklı atıştırmalık ekleyin.');
     var tot=plate.reduce(function(a,x){a.kcal+=x.kcal;a.p+=x.p;a.c+=x.c;a.f+=x.f;return a;},{kcal:0,p:0,c:0,f:0});
+
+    applyRecommendation(plate.map(function(x){return x.oi;}));
+
     var conds=health.length&&health[0]!=='yok'?(' · '+health.map(function(s){return HEALTH_LABEL[s];}).join(', ')):'';
-    botSayHtml('Senin için <b>'+d.day+' '+MONTHS[d.month-1]+'</b> menüsünden <b>'+GOAL_LABEL[goal]+'</b>'+conds+' hedefine göre önerim 👇');
-    var rows=plate.map(function(x){ return '<div class="rec-item"><span class="ri-emoji">'+x.emoji+'</span><span class="ri-name">'+esc(x.name)+'</span><span class="ri-kcal">'+x.kcal+' kcal</span><span class="ri-macros">Protein '+x.p+' g · Karb. '+x.c+' g · Yağ '+x.f+' g</span></div>'; }).join('');
-    botSayHtml('<div class="rec">'+rows+'<div class="rec-total">Toplam ≈ '+tot.kcal+' kcal · Protein '+tot.p+' g · Karbonhidrat '+tot.c+' g · Yağ '+tot.f+' g</div></div>');
-    if(notes.length) botSayHtml('<div class="rec-notes"><div class="rn-title">💡 Öneriler</div><ul>'+notes.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul></div>');
-    botSay('Not: Bunlar genel bilgilendirme amaçlı yaklaşık değerlerdir; tıbbi tavsiye değildir. Sağlık sorununuz varsa doktor/diyetisyeninize danışın. 🙏');
-    options([{t:'🔄 Baştan sor',v:'again'},{t:'Kapat',v:'close'}],function(v){ if(v==='again') dietStart(); else { userSay('Kapat'); closeDiet(); } });
+    botSayHtml('<b>'+d.day+' '+MONTHS[d.month-1]+'</b> menüsünden <b>'+GOAL_LABEL[goal]+'</b>'+conds+' hedefine göre <b>'+plate.length+' yemek</b> seçtim ve menüde işaretledim. ✅');
+    botSayHtml('<div class="rec-total">Seçilen toplam ≈ '+tot.kcal+' kcal · Protein '+tot.p+' g · Karbonhidrat '+tot.c+' g · Yağ '+tot.f+' g</div>');
+    if(notes.length) botSayHtml('<div class="rec-notes"><div class="rn-title">💡 Neden bu seçim?</div><ul>'+notes.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul></div>');
+    botSay('İstersen menüde başka bir yemeğe dokunarak tabağına ekleyip çıkarabilirsin; alttaki toplam otomatik güncellenir. Not: değerler yaklaşıktır, tıbbi tavsiye değildir. 🙏');
+    options([{t:'✓ Menüde göster',v:'close'},{t:'🔄 Baştan sor',v:'again'}],function(v){ if(v==='again') dietStart(); else { closeDiet(); window.scrollTo({top:0,behavior:'smooth'}); } });
   }
 
   initDietitian();

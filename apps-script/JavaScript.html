@@ -80,12 +80,20 @@
           '</div>' +
         '</div>' +
         '<div class="dishes">' +
-          (d.dishes.length ? d.dishes.map(dishHtml).join('') : '<div class="empty-day">Bu gün için menü girilmemiş.</div>') +
+          (d.dishes.length ? d.dishes.map(function (x, di) { return dishHtml(x, di); }).join('') : '<div class="empty-day">Bu gün için menü girilmemiş.</div>') +
         '</div>' +
+        '<div class="plate-bar empty" id="plateBar"></div>' +
       '</section>';
 
     if (hasPrev) document.getElementById('prevDay').addEventListener('click', function () { showDay(STATE.days[i - 1].iso, true); });
     if (hasNext) document.getElementById('nextDay').addEventListener('click', function () { showDay(STATE.days[i + 1].iso, true); });
+
+    var section = document.querySelector('#menu .day');
+    Array.prototype.forEach.call(section.querySelectorAll('.dish'), function (row) {
+      row.addEventListener('click', function () { toggleDishRow(row); });
+      row.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleDishRow(row); } });
+    });
+    recomputePlate();
 
     if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -94,18 +102,69 @@
 
   /* -------------------------- YEMEK SATIRI -------------------------- */
 
-  function dishHtml(dish) {
+  // plain=true -> arama sonuçları için (tıklanamaz, tik yok)
+  function dishHtml(dish, i, plain) {
     var g = gradientFor(dish.tag);
-    var kcal = (dish.kcal != null)
-      ? '<span class="kcal" title="Yaklaşık kalori (porsiyon başına)">≈ ' + dish.kcal + '<small>kcal</small></span>'
-      : '';
-    return '<div class="dish">' +
+    var k = (dish.kcal != null ? dish.kcal : (CAT_KCAL[dish.tag] || 200));
+    var m = macrosOf(k, dish.tag);
+    var tick = plain ? '' : '<span class="tick" aria-hidden="true"></span>';
+    var attrs = plain ? '' : (' data-i="' + i + '" data-kcal="' + k + '" data-p="' + m.p + '" data-c="' + m.c + '" data-f="' + m.f + '" role="button" tabindex="0" aria-pressed="false"');
+    return '<div class="dish' + (plain ? ' plain' : '') + '"' + attrs + '>' +
+      tick +
       '<span class="icon" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' + escapeHtml(dish.emoji || '🍽️') + '</span>' +
       '<div class="info">' +
         '<span class="dname">' + escapeHtml(dish.pretty || dish.name) + '</span>' +
         '<span class="dcat">' + escapeHtml(dish.category) + '</span>' +
-      '</div>' + kcal +
+      '</div>' +
+      '<span class="kcal" title="Porsiyon başına yaklaşık kalori">≈ ' + k + '<small>kcal</small></span>' +
     '</div>';
+  }
+
+  /* Bir yemeği tabağa ekle/çıkar */
+  function toggleDishRow(row) {
+    var on = row.classList.toggle('selected');
+    row.setAttribute('aria-pressed', on ? 'true' : 'false');
+    recomputePlate();
+  }
+
+  /* Diyetisyenin önerdiği yemekleri menüde işaretle, gerisini silikleştir */
+  function applyRecommendation(idxList) {
+    var section = document.querySelector('#menu .day');
+    if (!section) return;
+    Array.prototype.forEach.call(section.querySelectorAll('.dish'), function (row) {
+      var on = idxList.indexOf(+row.getAttribute('data-i')) !== -1;
+      row.classList.toggle('selected', on);
+      row.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    recomputePlate();
+  }
+
+  /* Seçili yemeklerin toplamını alt çubukta göster */
+  function recomputePlate() {
+    var section = document.querySelector('#menu .day');
+    if (!section) return;
+    var wrap = section.querySelector('.dishes');
+    var bar = section.querySelector('#plateBar');
+    if (!wrap || !bar) return;
+    var sel = section.querySelectorAll('.dish.selected');
+    wrap.classList.toggle('has-selection', sel.length > 0);
+
+    var tot = { n: 0, kcal: 0, p: 0, c: 0, f: 0 };
+    Array.prototype.forEach.call(sel, function (r) {
+      tot.n++; tot.kcal += +r.getAttribute('data-kcal');
+      tot.p += +r.getAttribute('data-p'); tot.c += +r.getAttribute('data-c'); tot.f += +r.getAttribute('data-f');
+    });
+
+    if (tot.n === 0) {
+      bar.className = 'plate-bar empty';
+      bar.innerHTML = '<span class="pb-hint">Bir yemeğe dokunarak tabağını oluştur ya da <b>🥗 Diyetisyen</b>\'e sor.</span>';
+    } else {
+      bar.className = 'plate-bar';
+      bar.innerHTML =
+        '<div class="pb-left"><span class="pb-n">' + tot.n + ' yemek seçildi</span>' +
+        '<span class="pb-macros">Protein ' + tot.p + ' g · Karb. ' + tot.c + ' g · Yağ ' + tot.f + ' g</span></div>' +
+        '<div class="pb-kcal">≈ ' + tot.kcal + '<small>kcal</small></div>';
+    }
   }
 
   function gradientFor(tag) {
@@ -136,7 +195,7 @@
             '<div class="day-title"><span class="wd">' + escapeHtml(d.weekday) + '</span>' +
             '<span class="sub">' + d.day + ' ' + MONTHS[d.month - 1] + '</span></div>' +
           '</div>' +
-          '<div class="dishes">' + matches.map(dishHtml).join('') + '</div>' +
+          '<div class="dishes">' + matches.map(function (x) { return dishHtml(x, 0, true); }).join('') + '</div>' +
         '</section>'
       );
     });
@@ -281,10 +340,10 @@
     var d = STATE.days[STATE.idx[STATE.curIso]] || STATE.days[STATE.idx[pickDefault()]];
     var goal = ANS.goal, health = ANS.health;
 
-    var list = d.dishes.map(function (x) {
+    var list = d.dishes.map(function (x, oi) {
       var k = (x.kcal != null ? x.kcal : (CAT_KCAL[x.tag] || 200));
       var m = macrosOf(k, x.tag);
-      return { name: x.pretty, emoji: x.emoji, tag: x.tag, kcal: k, p: m.p, c: m.c, f: m.f, raw: trLower(x.name) };
+      return { oi: oi, name: x.pretty, emoji: x.emoji, tag: x.tag, kcal: k, p: m.p, c: m.c, f: m.f, raw: trLower(x.name) };
     });
     function byTags(t) { return list.filter(function (x) { return t.indexOf(x.tag) !== -1; }); }
     var soups = byTags(['soup']), mains = byTags(['kebab']), starch = byTags(['rice', 'pasta']),
@@ -340,24 +399,17 @@
 
     var tot = plate.reduce(function (a, x) { a.kcal += x.kcal; a.p += x.p; a.c += x.c; a.f += x.f; return a; }, { kcal: 0, p: 0, c: 0, f: 0 });
 
+    applyRecommendation(plate.map(function (x) { return x.oi; }));
+
     var conds = health.length && health[0] !== 'yok' ? (' · ' + health.map(function (s) { return HEALTH_LABEL[s]; }).join(', ')) : '';
-    botSayHtml('Senin için <b>' + d.day + ' ' + MONTHS[d.month - 1] + '</b> menüsünden <b>' + GOAL_LABEL[goal] + '</b>' + conds + ' hedefine göre önerim 👇');
+    botSayHtml('<b>' + d.day + ' ' + MONTHS[d.month - 1] + '</b> menüsünden <b>' + GOAL_LABEL[goal] + '</b>' + conds + ' hedefine göre <b>' + plate.length + ' yemek</b> seçtim ve menüde işaretledim. ✅');
+    botSayHtml('<div class="rec-total">Seçilen toplam ≈ ' + tot.kcal + ' kcal · Protein ' + tot.p + ' g · Karbonhidrat ' + tot.c + ' g · Yağ ' + tot.f + ' g</div>');
+    if (notes.length) botSayHtml('<div class="rec-notes"><div class="rn-title">💡 Neden bu seçim?</div><ul>' + notes.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>');
+    botSay('İstersen menüde başka bir yemeğe dokunarak tabağına ekleyip çıkarabilirsin; alttaki toplam otomatik güncellenir. Not: değerler yaklaşıktır, tıbbi tavsiye değildir. 🙏');
 
-    var rows = plate.map(function (x) {
-      return '<div class="rec-item"><span class="ri-emoji">' + x.emoji + '</span>' +
-        '<span class="ri-name">' + escapeHtml(x.name) + '</span>' +
-        '<span class="ri-kcal">' + x.kcal + ' kcal</span>' +
-        '<span class="ri-macros">Protein ' + x.p + ' g · Karb. ' + x.c + ' g · Yağ ' + x.f + ' g</span></div>';
-    }).join('');
-    botSayHtml('<div class="rec">' + rows +
-      '<div class="rec-total">Toplam ≈ ' + tot.kcal + ' kcal · Protein ' + tot.p + ' g · Karbonhidrat ' + tot.c + ' g · Yağ ' + tot.f + ' g</div></div>');
-
-    if (notes.length) botSayHtml('<div class="rec-notes"><div class="rn-title">💡 Öneriler</div><ul>' + notes.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>');
-    botSay('Not: Bunlar genel bilgilendirme amaçlı yaklaşık değerlerdir; tıbbi tavsiye değildir. Sağlık sorununuz varsa doktor/diyetisyeninize danışın. 🙏');
-
-    options([{ t: '🔄 Baştan sor', v: 'again' }, { t: 'Kapat', v: 'close' }], function (v) {
+    options([{ t: '✓ Menüde göster', v: 'close' }, { t: '🔄 Baştan sor', v: 'again' }], function (v) {
       if (v === 'again') dietStart();
-      else { userSay('Kapat'); closeDiet(); }
+      else { closeDiet(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     });
   }
 

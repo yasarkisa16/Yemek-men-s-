@@ -128,8 +128,10 @@ kullanıcıya sırayla sorar:
 2. **Sağlık durumu** (çoklu seçim): Yok · Şeker (diyabet) · Kolesterol · Tansiyon
 3. **Hedef**: Zayıflama · Kilo alma · Kas yapma · Kilo koruma
 
-Sonra **o an seçili günün menüsünden** bir tabak önerir ve her yemeğin **kalori +
-protein/karbonhidrat/yağ** değerini + toplamı gösterir. Öneri firma kuralına uyar:
+Sonra öneriyi **doğrudan o günün listesine uygular**: önerdiği yemekler **işaretli
+(aktif)** kalır, diğerleri **silikleşir**, ve listenin **altında seçili toplam kalori +
+protein/karbonhidrat/yağ** görünür. Kullanıcı istediği yemeğe **dokunarak (tik)** tabağına
+ekleyip çıkarabilir; toplam anında güncellenir. Öneri firma kuralına uyar:
 
 - **Pilav/makarna** varsa yalnızca **1 tanesi** seçilir.
 - **Köfte/tavuk/et** gibi ana yemeklerden yalnızca **1 tanesi** seçilir.

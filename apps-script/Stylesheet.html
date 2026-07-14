@@ -235,6 +235,36 @@
   }
   .dish .kcal small { font-size: 10px; font-weight: 700; color: var(--muted); }
 
+  /* seçilebilir tabak + tik */
+  .dish { cursor: pointer; }
+  .dish .tick {
+    width: 22px; height: 22px; flex: none;
+    border: 2px solid color-mix(in srgb, var(--brand) 40%, var(--line));
+    border-radius: 7px; display: grid; place-items: center;
+    transition: background .12s ease, border-color .12s ease;
+  }
+  .dish.selected { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 9%, var(--card)); }
+  .dish.selected .tick { background: var(--brand); border-color: var(--brand); }
+  .dish.selected .tick::after { content: "✓"; font-size: 14px; font-weight: 900; color: var(--dark); line-height: 1; }
+  .dishes.has-selection .dish:not(.selected) { opacity: .42; }
+  .dishes.has-selection .dish:not(.selected):hover { opacity: .85; }
+
+  /* alt toplam çubuğu */
+  .plate-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #1d2433, #2a3346);
+    color: #fff;
+  }
+  .plate-bar.empty { background: var(--card); border-top: 1px dashed var(--line); color: var(--muted); justify-content: center; text-align: center; }
+  .plate-bar .pb-left { display: flex; flex-direction: column; gap: 2px; }
+  .plate-bar .pb-hint { font-size: 13px; }
+  .dish.plain { cursor: default; }
+  .plate-bar .pb-n { font-weight: 800; font-size: 14px; display: block; }
+  .plate-bar .pb-macros { font-size: 12px; opacity: .82; }
+  .plate-bar .pb-kcal { font-size: 24px; font-weight: 800; color: var(--brand); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .plate-bar .pb-kcal small { font-size: 11px; color: rgba(255,255,255,.7); font-weight: 700; margin-left: 2px; }
+
   .empty-day { padding: 8px 4px 6px; color: var(--muted); font-size: 14px; }
 
   /* -------------------------- DURUM MESAJLARI -------------------------- */
@@ -284,34 +314,37 @@
   .diet-fab:active { transform: scale(.96); }
   .diet-fab:focus-visible { outline: 3px solid var(--dark); outline-offset: 2px; }
 
-  .diet-overlay { position: fixed; inset: 0; background: rgba(15, 20, 30, .5); z-index: 60; }
+  .diet-overlay { position: fixed; inset: 0; background: rgba(15, 20, 30, .45); z-index: 60; backdrop-filter: blur(2px); }
+  .diet-overlay[hidden] { display: none; }
 
   .diet-panel {
     position: fixed; top: 0; right: 0; bottom: 0; z-index: 70;
-    width: 410px; max-width: 92vw;
+    width: 372px; max-width: 92vw;
     background: var(--bg);
     box-shadow: -14px 0 44px rgba(0, 0, 0, .32);
     display: flex; flex-direction: column;
     animation: dietIn .25s ease;
   }
+  /* [hidden] tek başına display:flex'i yenemez; açıkça gizle */
+  .diet-panel[hidden] { display: none; }
   @keyframes dietIn { from { transform: translateX(24px); opacity: .3; } to { transform: none; opacity: 1; } }
 
   .diet-head {
-    display: flex; align-items: center; gap: 12px;
-    padding: 16px 18px;
+    display: flex; align-items: center; gap: 11px;
+    padding: 13px 16px;
     background: linear-gradient(135deg, #1d2433, #2a3346);
     color: #fff; flex: none;
   }
-  .diet-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--brand); color: var(--dark); display: grid; place-items: center; font-size: 22px; flex: none; }
-  .diet-name { font-weight: 800; font-size: 16px; }
-  .diet-status { font-size: 12px; opacity: .82; }
-  .diet-close { margin-left: auto; background: rgba(255, 255, 255, .16); color: #fff; border: none; width: 34px; height: 34px; border-radius: 9px; font-size: 15px; cursor: pointer; }
+  .diet-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--brand); color: var(--dark); display: grid; place-items: center; font-size: 19px; flex: none; }
+  .diet-name { font-weight: 800; font-size: 15px; }
+  .diet-status { font-size: 11.5px; opacity: .8; }
+  .diet-close { margin-left: auto; background: rgba(255, 255, 255, .16); color: #fff; border: none; width: 32px; height: 32px; border-radius: 9px; font-size: 14px; cursor: pointer; }
   .diet-close:hover { background: rgba(255, 255, 255, .28); }
 
-  .diet-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-  .diet-actions { padding: 12px 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; background: var(--card); }
+  .diet-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 9px; }
+  .diet-actions { padding: 12px 14px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 7px; background: var(--card); }
 
-  .msg { max-width: 90%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.45; }
+  .msg { max-width: 90%; padding: 9px 13px; border-radius: 15px; font-size: 13.5px; line-height: 1.45; }
   .msg.bot { align-self: flex-start; background: var(--card); border: 1px solid var(--line); border-bottom-left-radius: 5px; color: var(--ink); }
   .msg.user { align-self: flex-end; background: var(--brand); color: var(--dark); font-weight: 600; border-bottom-right-radius: 5px; }
   .msg b { font-weight: 800; }
