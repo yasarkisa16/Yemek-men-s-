@@ -269,4 +269,78 @@
     .dish .kcal { font-size: 14px; padding: 5px 10px; }
     select#dateSelect { min-width: 180px; }
   }
+
+  /* -------------------------- DİYETİSYEN ASİSTAN -------------------------- */
+  .diet-fab {
+    position: fixed; right: 18px; bottom: 18px; z-index: 50;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #82e600, #6cc400);
+    color: var(--dark); border: none; border-radius: 999px;
+    padding: 13px 20px; font-size: 15px; font-weight: 800; font-family: inherit;
+    cursor: pointer; box-shadow: 0 10px 26px rgba(29, 36, 51, .30);
+    transition: transform .1s ease, filter .12s ease;
+  }
+  .diet-fab:hover { filter: brightness(1.05); }
+  .diet-fab:active { transform: scale(.96); }
+  .diet-fab:focus-visible { outline: 3px solid var(--dark); outline-offset: 2px; }
+
+  .diet-overlay { position: fixed; inset: 0; background: rgba(15, 20, 30, .5); z-index: 60; }
+
+  .diet-panel {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 70;
+    width: 410px; max-width: 92vw;
+    background: var(--bg);
+    box-shadow: -14px 0 44px rgba(0, 0, 0, .32);
+    display: flex; flex-direction: column;
+    animation: dietIn .25s ease;
+  }
+  @keyframes dietIn { from { transform: translateX(24px); opacity: .3; } to { transform: none; opacity: 1; } }
+
+  .diet-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #1d2433, #2a3346);
+    color: #fff; flex: none;
+  }
+  .diet-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--brand); color: var(--dark); display: grid; place-items: center; font-size: 22px; flex: none; }
+  .diet-name { font-weight: 800; font-size: 16px; }
+  .diet-status { font-size: 12px; opacity: .82; }
+  .diet-close { margin-left: auto; background: rgba(255, 255, 255, .16); color: #fff; border: none; width: 34px; height: 34px; border-radius: 9px; font-size: 15px; cursor: pointer; }
+  .diet-close:hover { background: rgba(255, 255, 255, .28); }
+
+  .diet-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .diet-actions { padding: 12px 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; background: var(--card); }
+
+  .msg { max-width: 90%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.45; }
+  .msg.bot { align-self: flex-start; background: var(--card); border: 1px solid var(--line); border-bottom-left-radius: 5px; color: var(--ink); }
+  .msg.user { align-self: flex-end; background: var(--brand); color: var(--dark); font-weight: 600; border-bottom-right-radius: 5px; }
+  .msg b { font-weight: 800; }
+
+  .opt {
+    background: var(--card); color: var(--ink);
+    border: 1.5px solid color-mix(in srgb, var(--brand) 45%, var(--line));
+    border-radius: 999px; padding: 9px 14px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+  .opt:hover { background: color-mix(in srgb, var(--brand) 14%, var(--card)); }
+  .opt.sel { background: var(--brand); color: var(--dark); border-color: var(--brand); }
+  .opt.cont { background: var(--dark); color: #fff; border-color: var(--dark); margin-left: auto; }
+  .opt:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+  .rec { display: flex; flex-direction: column; gap: 4px; }
+  .rec-item { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+  .rec-item .ri-emoji { font-size: 20px; }
+  .rec-item .ri-name { flex: 1; font-weight: 700; font-size: 13.5px; }
+  .rec-item .ri-kcal { font-size: 12px; font-weight: 800; color: var(--brand-600); }
+  .rec-item .ri-macros { width: 100%; padding-left: 28px; font-size: 11.5px; color: var(--muted); }
+  .rec-total { font-weight: 800; font-size: 13px; color: var(--ink); background: color-mix(in srgb, var(--brand) 15%, var(--card)); border: 1px solid color-mix(in srgb, var(--brand) 30%, var(--line)); border-radius: 10px; padding: 9px 11px; margin-top: 6px; }
+  .rec-notes .rn-title { font-weight: 800; margin-bottom: 5px; }
+  .rec-notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+  .rec-notes li { font-size: 13px; }
+
+  @media (max-width: 480px) {
+    .diet-panel { width: 100vw; max-width: 100vw; }
+    .diet-fab span { display: none; }
+    .diet-fab { padding: 15px; font-size: 22px; }
+  }
 </style>

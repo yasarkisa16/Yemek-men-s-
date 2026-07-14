@@ -36,6 +36,22 @@
     </footer>
   </div>
 
+  <!-- Diyetisyen Asistan -->
+  <button id="dietFab" class="diet-fab" type="button" aria-label="Diyetisyen asistan">🥗<span>Diyetisyen</span></button>
+  <div id="dietOverlay" class="diet-overlay" hidden></div>
+  <aside id="dietPanel" class="diet-panel" hidden aria-label="Diyetisyen asistan">
+    <div class="diet-head">
+      <div class="diet-avatar">🥗</div>
+      <div>
+        <div class="diet-name">Diyetisyen Asistan</div>
+        <div class="diet-status">Menüye göre sağlıklı seçim</div>
+      </div>
+      <button id="dietClose" class="diet-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div id="dietBody" class="diet-body"></div>
+    <div id="dietActions" class="diet-actions"></div>
+  </aside>
+
   <?!= include('JavaScript'); ?>
 </body>
 </html>

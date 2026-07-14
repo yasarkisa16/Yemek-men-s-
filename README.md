@@ -8,6 +8,7 @@ bir web sitesine dönüştüren Google Apps Script projesi.
 - 📖 **Tek gün görünümü**: hangi tarihi seçerseniz yalnızca o günün listesi açılır
 - 🔥 Her yemeğin yanında **kalori değeri** (yemek tipine göre, porsiyon başına yaklaşık)
 - 🎨 Her yemekte şık, renkli bir **kategori ikonu** (çorba/et/pilav/tatlı…)
+- 🥗 **Diyetisyen Asistan** (yandan açılır): sağlık durumu + hedefi sorar, o günün menüsünden firma kuralına uygun bir tabak önerir (kalori + protein/karbonhidrat/yağ)
 - 🔎 Yemek arama (tüm günlerde)
 - 📱 Telefon / tablet / bilgisayar uyumlu
 - ⚡ Veriler E-Tablo'dan **canlı** çekilir — tabloyu güncellediğinizde site de güncellenir
@@ -115,6 +116,30 @@ CALORIE_OVERRIDES: {
 Kalori sütununu tümüyle kapatmak için `CONFIG.SHOW_CALORIES: false` yap.
 
 > Not: Kalori değerleri **yaklaşık** tahminlerdir; porsiyon ve tarife göre değişir.
+
+---
+
+## 🥗 Diyetisyen Asistan
+
+Sağ alttaki **🥗 Diyetisyen** butonuna basınca yandan bir sohbet paneli açılır ve
+kullanıcıya sırayla sorar:
+
+1. **Yardımcı olayım mı?** (Evet / Hayır)
+2. **Sağlık durumu** (çoklu seçim): Yok · Şeker (diyabet) · Kolesterol · Tansiyon
+3. **Hedef**: Zayıflama · Kilo alma · Kas yapma · Kilo koruma
+
+Sonra **o an seçili günün menüsünden** bir tabak önerir ve her yemeğin **kalori +
+protein/karbonhidrat/yağ** değerini + toplamı gösterir. Öneri firma kuralına uyar:
+
+- **Pilav/makarna** varsa yalnızca **1 tanesi** seçilir.
+- **Köfte/tavuk/et** gibi ana yemeklerden yalnızca **1 tanesi** seçilir.
+- Hedefe göre ayarlanır: zayıflamada karbonhidrat azaltılır, kas yapmada yüksek
+  protein öne çıkar, kilo almada porsiyon/tatlı eklenir.
+- Sağlık durumuna göre uyarılır: diyabet → tatlı yok/bulgur tercih; kolesterol →
+  ızgara-haşlama, kızartma yok; tansiyon → turşu/tuz uyarısı.
+
+> Tüm mantık site içinde çalışır (ek servis/anahtar gerekmez). Değerler yaklaşıktır;
+> **tıbbi tavsiye değildir**, panelde de bu not gösterilir.
 
 ---
 
