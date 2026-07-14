@@ -72,7 +72,7 @@ function include(name) {
 function getMenuData() {
   var data;
   var cache = null;
-  var key = 'menu_v3_' + CONFIG.SPREADSHEET_ID + '_' + (CONFIG.SHEET_NAME || 'first');
+  var key = 'menu_v4_' + CONFIG.SPREADSHEET_ID + '_' + (CONFIG.SHEET_NAME || 'first');
 
   if (CONFIG.CACHE_MINUTES > 0) {
     try {
