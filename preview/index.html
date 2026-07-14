@@ -2,22 +2,19 @@
 <style>
   /* ===== VALEO: Yeşil #82E600 · Mirage #1D2433 · Beyaz ===== */
   :root {
-    --bg: #f3f6f1; --card: #ffffff; --ink: #1d2433; --muted: #6c7482;
-    --brand: #82e600; --brand-600: #5fae00; --dark: #1d2433; --dark-2: #2a3346;
-    --line: #e4e9df; --shadow: 0 10px 34px rgba(29, 36, 51, 0.12); --radius: 16px;
+    --bg:#f3f6f1; --card:#ffffff; --ink:#1d2433; --muted:#6c7482;
+    --brand:#82e600; --brand-600:#5fae00; --dark:#1d2433; --dark-2:#2a3346;
+    --line:#e4e9df; --shadow:0 10px 34px rgba(29,36,51,0.12); --radius:16px;
   }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#141a26; --card:#1f2735; --ink:#eef1f5; --muted:#9aa3b2; --line:#2c3546; --shadow:0 10px 34px rgba(0,0,0,0.5); }
-  }
-  :root[data-theme="dark"] { --bg:#141a26; --card:#1f2735; --ink:#eef1f5; --muted:#9aa3b2; --line:#2c3546; --shadow:0 10px 34px rgba(0,0,0,0.5); }
-  :root[data-theme="light"] { --bg:#f3f6f1; --card:#ffffff; --ink:#1d2433; --muted:#6c7482; --line:#e4e9df; --shadow:0 10px 34px rgba(29,36,51,0.12); }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#141a26; --card:#1f2735; --ink:#eef1f5; --muted:#9aa3b2; --line:#2c3546; --shadow:0 10px 34px rgba(0,0,0,0.5); } }
+  :root[data-theme="dark"]{ --bg:#141a26; --card:#1f2735; --ink:#eef1f5; --muted:#9aa3b2; --line:#2c3546; --shadow:0 10px 34px rgba(0,0,0,0.5); }
+  :root[data-theme="light"]{ --bg:#f3f6f1; --card:#ffffff; --ink:#1d2433; --muted:#6c7482; --line:#e4e9df; --shadow:0 10px 34px rgba(29,36,51,0.12); }
 
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased; }
-  .app { max-width: 1040px; margin: 0 auto; padding: 0 16px 60px; }
-  .note { background: color-mix(in srgb, var(--brand) 14%, var(--bg)); border: 1px dashed color-mix(in srgb, var(--brand-600) 55%, var(--line)); color: var(--ink); border-radius: 12px; padding: 10px 14px; font-size: 13px; margin: 14px 0 0; text-align: center; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased; }
+  .app { max-width:1040px; margin:0 auto; padding:0 16px 60px; }
 
-  .hero { position: relative; background: linear-gradient(135deg,#1d2433 0%,#2a3346 55%,#1d2433 100%); color:#fff; border-radius:0 0 28px 28px; padding:34px 22px 30px; margin:0 -16px 26px; box-shadow:var(--shadow); text-align:center; overflow:hidden; }
+  .hero { position:relative; background:linear-gradient(135deg,#1d2433 0%,#2a3346 55%,#1d2433 100%); color:#fff; border-radius:0 0 28px 28px; padding:34px 22px 30px; margin:0 -16px 26px; box-shadow:var(--shadow); text-align:center; overflow:hidden; }
   .hero::before { content:""; position:absolute; top:0; left:0; right:0; height:4px; background:var(--brand); }
   .hero-inner { max-width:720px; margin:0 auto; position:relative; }
   .badge { display:inline-block; background:var(--brand); color:var(--dark); padding:6px 14px; border-radius:999px; font-size:13px; font-weight:800; letter-spacing:.4px; margin-bottom:14px; }
@@ -45,25 +42,24 @@
   .day-title .sub { font-size:13px; color:var(--muted); }
   .today-tag { background:var(--brand); color:var(--dark); font-size:11px; font-weight:800; padding:3px 9px; border-radius:999px; margin-left:8px; }
   .daynav { display:flex; gap:8px; flex:none; }
-  .navbtn { width:40px; height:40px; border:1px solid var(--line); background:#fff; color:var(--brand-600); border-radius:11px; font-size:22px; font-weight:800; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .navbtn { width:40px; height:40px; border:1px solid var(--line); background:var(--card); color:var(--brand-600); border-radius:11px; font-size:22px; font-weight:800; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
   .navbtn:hover:not([disabled]) { background:var(--brand); color:var(--dark); border-color:var(--brand); }
   .navbtn:active:not([disabled]) { transform:scale(.94); }
   .navbtn[disabled] { opacity:.35; cursor:not-allowed; }
 
-  .dishes { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; padding:18px 20px 22px; }
-  .dish { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; transition:transform .12s ease, box-shadow .12s ease; }
-  .dish:hover { transform:translateY(-3px); box-shadow:var(--shadow); }
-  .thumb { position:relative; aspect-ratio:4/3; overflow:hidden; display:grid; place-items:center; }
-  .thumb .emoji { font-size:52px; filter:drop-shadow(0 3px 6px rgba(0,0,0,.28)); }
-  .thumb .photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .thumb.has-photo { background:#eef1ec !important; }
-  .thumb.has-photo .emoji { display:none; }
-  .cat { position:absolute; top:8px; left:8px; background:rgba(29,36,51,.78); color:#fff; font-size:11px; font-weight:600; padding:3px 8px; border-radius:999px; }
-  .dish .name { padding:10px 12px 12px; font-size:14px; font-weight:600; }
+  .dishes { display:flex; flex-direction:column; gap:10px; padding:16px 18px 20px; }
+  .dish { display:flex; align-items:center; gap:14px; padding:10px 12px; background:var(--card); border:1px solid var(--line); border-radius:14px; transition:transform .1s ease, box-shadow .1s ease, border-color .1s ease; }
+  .dish:hover { transform:translateY(-1px); box-shadow:var(--shadow); border-color:color-mix(in srgb, var(--brand) 35%, var(--line)); }
+  .dish .icon { width:52px; height:52px; flex:none; border-radius:13px; display:grid; place-items:center; font-size:27px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.28), 0 2px 6px rgba(29,36,51,.12); }
+  .dish .info { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .dish .dname { font-size:15px; font-weight:700; color:var(--ink); }
+  .dish .dcat { font-size:12px; color:var(--muted); }
+  .dish .kcal { flex:none; display:inline-flex; align-items:baseline; gap:3px; font-size:15px; font-weight:800; color:var(--brand-600); background:color-mix(in srgb, var(--brand) 15%, var(--card)); border:1px solid color-mix(in srgb, var(--brand) 35%, var(--line)); padding:6px 12px; border-radius:999px; font-variant-numeric:tabular-nums; }
+  .dish .kcal small { font-size:10px; font-weight:700; color:var(--muted); }
   .noresult { text-align:center; padding:40px 20px; color:var(--muted); }
 
   .foot { text-align:center; color:var(--muted); font-size:12px; margin-top:30px; }
-  @media (max-width:480px){ .day-head{padding:14px;gap:10px;} .dishes{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));padding:14px;} select#dateSelect{min-width:180px;} }
+  @media (max-width:480px){ .day-head{padding:14px;gap:10px;} .dishes{padding:14px;} .dish .icon{width:46px;height:46px;font-size:24px;} .dish .kcal{font-size:14px;padding:5px 10px;} select#dateSelect{min-width:180px;} }
   @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
 </style>
 
@@ -72,7 +68,7 @@
     <div class="hero-inner">
       <span class="badge">Valeo</span>
       <h1>Temmuz Yemek Listesi</h1>
-      <p class="subtitle">Bir tarih seçin, o günün menüsü aşağıda açılsın.</p>
+      <p class="subtitle">Bir tarih seçin; o günün menüsü ve kalori değerleri aşağıda açılsın.</p>
       <div class="controls">
         <label for="dateSelect">Tarih:</label>
         <select id="dateSelect"></select>
@@ -82,8 +78,10 @@
     </div>
   </header>
   <main id="menu" class="menu"></main>
-  <p class="note">Her yemeğin fotoğrafı <strong>Türkçe Wikipedia'dan otomatik</strong> yüklenir. Bu önizleme penceresi güvenlik nedeniyle dış istekleri engellerse kategori simgeleri kalır; <strong>yayınlanan sitede (ve bu dosyayı tarayıcıda açtığınızda) gerçek fotoğraflar</strong> gelir.</p>
-  <footer class="foot">Örnek veri: 1–10 Temmuz 2026 · Gerçek veriler E-Tablo'dan çekilir.</footer>
+  <footer class="foot">
+    Kalori değerleri yemek tipine göre <strong>porsiyon başına yaklaşık</strong> tahminlerdir.<br>
+    Örnek veri: 1–10 Temmuz 2026 · Gerçek veriler E-Tablo'dan çekilir.
+  </footer>
 </div>
 
 <script>
@@ -102,7 +100,6 @@
   var MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
   var MONTHS_SHORT = ['OCA','ŞUB','MAR','NİS','MAY','HAZ','TEM','AĞU','EYL','EKİ','KAS','ARA'];
   var WD = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-  var PHOTO_CACHE = {};
 
   function trLower(s){ return String(s==null?'':s).replace(/İ/g,'i').replace(/I/g,'ı').toLowerCase(); }
   function trUpperFirst(c){ return c==='i'?'İ':(c==='ı'?'I':c.toUpperCase()); }
@@ -133,19 +130,26 @@
     var m={soup:['#e0a35a','#c9711f'],kebab:['#c9502a','#a13417'],rice:['#e6c887','#cba954'],pasta:['#e8b96a','#cf9a3d'],pastry:['#e0a458','#c47e2b'],dessert:['#d98cae','#bd5f88'],salad:['#7cbf59','#4f9b3a'],pickles:['#8fb84f','#6a9433'],vegetable:['#8aa84a','#5f8034'],ayran:['#79b6d6','#4f8fb8'],yogurt:['#cfd6dd','#a7b0ba'],hummus:['#d9b56b','#bd923f'],bread:['#d7b483','#b98f52']};
     return m[tag]||['#c99a5a','#a9793a'];
   }
-  function dishQuery(name){
+
+  var CATEGORY_KCAL = { soup:120, kebab:360, rice:270, pasta:320, pastry:300, dessert:340, salad:70, pickles:20, vegetable:170, ayran:70, yogurt:90, hummus:170, bread:90, 'turkish-food':220 };
+  var KCAL_KEYWORDS = [
+    ['mercimek çorba',150],['ezogelin',140],['düğün çorba',160],['yoğurt çorba',150],['yayla',150],['tavuksuyu',90],['tavuk suyu',90],['terbiyeli',140],['domates çorba',130],['şehriye çorba',130],['sebze çorba',100],['soğuk çorba',90],['çorba',120],
+    ['baklava',380],['künefe',450],['kadayıf',380],['tulumba',360],['sütlaç',220],['muhallebi',200],['kazandibi',260],['aşure',250],['dondurma',200],['revani',340],['irmik helva',360],['helva',360],['profiterol',380],['trileçe',330],['kemalpaşa',340],['spoonful',300],['çikolatalı',320],['tatlı',320],
+    ['iskender',650],['döner',520],['lahmacun',300],['pizza',450],['adana',480],['urfa',470],['şiş',380],['fırın köfte',340],['izgara köfte',320],['çiğ köfte',180],['köfte',320],['musakka',300],['karnıyarık',300],['saç kavurma',380],['kavurma',400],['güveç',280],['schnitzel',400],['şnitzel',400],['biftek',350],['bonfile',380],['tavuk sote',300],['tavuk',300],['piliç',300],['baget',320],['kanat',350],
+    ['etli nohut',260],['kuru fasulye',280],['barbunya',250],['taze fasulye',130],['nohut',240],['bamya',120],['türlü',160],['semizotu',110],['ıspanak',120],['pırasa',120],['kabak',120],['bezelye',150],['dolma',220],['sarma',200],['mücver',240],['imambayıldı',220],['zeytinyağlı',150],['etli',300],
+    ['mantı',350],['makarna',320],['erişte',300],['lazanya',380],['su böreği',320],['börek',320],['poğaça',260],['gözleme',300],['pide',350],['bulgur',250],['pilav',270],
+    ['ayran',60],['cacık',90],['kefir',70],['şıra',120],['yoğurt',90],['humus',180],['haydari',150],['ezme',90],['söğüş',30],['salata',60],['turşu',20],['herse',250],['keşkek',260],['kısır',180]
+  ];
+  function calorieFor(name, tag){
     var n=trLower(name);
-    var map=[['ezogelin','ezogelin çorbası'],['mercimek','mercimek çorbası'],['düğün çorba','düğün çorbası'],['tavuksuyu','tavuk suyu çorbası'],['yoğurt çorba','yayla çorbası'],['domates çorba','domates çorbası'],['şehriye çorba','şehriye çorbası'],['sebze çorba','sebze çorbası'],['çiğ köfte','çiğ köfte'],['iskender','iskender kebap'],['musakka','musakka'],['biftek','biftek'],['baget','tavuk baget'],['piliç','ızgara tavuk'],['tavuk','tavuk yemeği'],['köfte','köfte'],['bulgur','bulgur pilavı'],['pilav','pilav'],['mantı','mantı'],['makarna','makarna'],['börek','su böreği'],['ayran','ayran'],['cacık','cacık'],['yoğurt','yoğurt'],['humus','humus'],['dondurma','dondurma'],['baklava','baklava'],['sütlaç','sütlaç'],['aşure','aşure'],['revani','revani'],['helva','helva'],['kuru fasulye','kuru fasulye'],['taze fasulye','taze fasulye'],['fasulye','kuru fasulye'],['nohut','nohut yemeği'],['bamya','bamya yemeği'],['türlü','türlü'],['semizotu','semizotu yemeği'],['ıspanak','ıspanak yemeği'],['kısır','kısır'],['söğüş','söğüş'],['salata','salata'],['turşu','turşu'],['herse','keşkek'],['çorba','çorba']];
-    for(var i=0;i<map.length;i++){ if(n.indexOf(map[i][0])!==-1) return map[i][1]; }
-    var strip=['karışık','soslu','sade','terbiyeli','ferah','soğuk','sıcak','fırın','fırında','kasap','ev','közlenmiş','zeytinyağlı','etli','taze','mevsim','çıtır','özel','sebzeli','peynirli','mantarlı','mantar','yoğurtlu','ekşili','arpa','şehriyeli','mısırlı','biberiye','göbek','yeşil','çoban'];
-    var words=n.replace(/&/g,' ').replace(/\./g,' ').split(/\s+/).filter(function(w){return w&&strip.indexOf(w)===-1;});
-    return words.join(' ').trim()||n;
+    for(var i=0;i<KCAL_KEYWORDS.length;i++){ if(n.indexOf(KCAL_KEYWORDS[i][0])!==-1) return KCAL_KEYWORDS[i][1]; }
+    return CATEGORY_KCAL[tag]||200;
   }
 
   var DAYS = Object.keys(RAW).sort().map(function(iso){
     var p=iso.split('-').map(Number), dt=new Date(p[0],p[1]-1,p[2]);
     return { iso:iso, day:p[2], month:p[1], weekday:WD[dt.getDay()],
-      dishes: RAW[iso].map(function(name){ var c=categorize(name); return {name:name, pretty:toTitleTr(name), emoji:c.emoji, category:c.label, tag:c.tag}; }) };
+      dishes: RAW[iso].map(function(name){ var c=categorize(name); return {name:name, pretty:toTitleTr(name), emoji:c.emoji, category:c.label, tag:c.tag, kcal:calorieFor(name,c.tag)}; }) };
   });
   var IDX={}; DAYS.forEach(function(d,i){ IDX[d.iso]=i; });
   var CUR=null;
@@ -159,10 +163,11 @@
 
   function dishHtml(dish){
     var g=gradientFor(dish.tag);
-    return '<div class="dish" data-q="'+esc(dishQuery(dish.name))+'">'+
-      '<div class="thumb" style="background:linear-gradient(135deg,'+g[0]+','+g[1]+')">'+
-        '<span class="emoji">'+dish.emoji+'</span><span class="cat">'+dish.emoji+' '+esc(dish.category)+'</span>'+
-      '</div><div class="name">'+esc(dish.pretty)+'</div></div>';
+    return '<div class="dish">'+
+      '<span class="icon" style="background:linear-gradient(135deg,'+g[0]+','+g[1]+')">'+dish.emoji+'</span>'+
+      '<div class="info"><span class="dname">'+esc(dish.pretty)+'</span><span class="dcat">'+esc(dish.category)+'</span></div>'+
+      '<span class="kcal" title="Yaklaşık kalori (porsiyon başına)">≈ '+dish.kcal+'<small>kcal</small></span>'+
+    '</div>';
   }
 
   function showDay(iso, scroll){
@@ -170,8 +175,7 @@
     var i=IDX[iso], d=DAYS[i];
     var sel=document.getElementById('dateSelect'); if(sel.value!==iso) sel.value=iso;
     var hasPrev=i>0, hasNext=i<DAYS.length-1, isToday=iso===TODAY;
-    var menu=document.getElementById('menu');
-    menu.innerHTML='<section class="day">'+
+    document.getElementById('menu').innerHTML='<section class="day">'+
       '<div class="day-head">'+
         '<span class="day-date"><span class="d">'+d.day+'</span><span class="m">'+MONTHS_SHORT[d.month-1]+'</span></span>'+
         '<div class="day-title"><span class="wd">'+esc(d.weekday)+(isToday?'<span class="today-tag">BUGÜN</span>':'')+'</span><span class="sub">'+d.day+' '+MONTHS[d.month-1]+' · '+d.dishes.length+' çeşit yemek</span></div>'+
@@ -180,7 +184,6 @@
       '<div class="dishes">'+d.dishes.map(dishHtml).join('')+'</div></section>';
     if(hasPrev) document.getElementById('prevDay').addEventListener('click',function(){ showDay(DAYS[i-1].iso,true); });
     if(hasNext) document.getElementById('nextDay').addEventListener('click',function(){ showDay(DAYS[i+1].iso,true); });
-    loadPhotos(menu);
     if(scroll) window.scrollTo({top:0,behavior:'smooth'});
   }
 
@@ -193,29 +196,7 @@
       if(!m.length) return;
       blocks.push('<section class="day"><div class="day-head"><span class="day-date"><span class="d">'+d.day+'</span><span class="m">'+MONTHS_SHORT[d.month-1]+'</span></span><div class="day-title"><span class="wd">'+esc(d.weekday)+'</span><span class="sub">'+d.day+' '+MONTHS[d.month-1]+'</span></div></div><div class="dishes">'+m.map(dishHtml).join('')+'</div></section>');
     });
-    var menu=document.getElementById('menu');
-    menu.innerHTML=blocks.length?('<div class="search-head">“'+esc(q)+'” için '+blocks.length+' gün bulundu</div>'+blocks.join('')):('<div class="noresult">“'+esc(q)+'” için sonuç bulunamadı.</div>');
-    if(blocks.length) loadPhotos(menu);
-  }
-
-  function loadPhotos(root){ Array.prototype.forEach.call(root.querySelectorAll('.dish'), loadPhoto); }
-  function loadPhoto(el){
-    if(el.getAttribute('data-loaded')) return; el.setAttribute('data-loaded','1');
-    if(!window.fetch) return;
-    var q=el.getAttribute('data-q'); if(!q) return;
-    if(PHOTO_CACHE[q]!==undefined){ if(PHOTO_CACHE[q]) setPhoto(el,PHOTO_CACHE[q]); return; }
-    var api='https://tr.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=1&gsrnamespace=0&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1';
-    fetch(api).then(function(r){return r.json();}).then(function(d){
-      var src=''; var pages=d&&d.query&&d.query.pages;
-      if(pages){ for(var k in pages){ var p=pages[k]; if(p.thumbnail&&p.thumbnail.source){src=p.thumbnail.source;break;} } }
-      PHOTO_CACHE[q]=src; if(src) setPhoto(el,src);
-    }).catch(function(){ PHOTO_CACHE[q]=''; });
-  }
-  function setPhoto(el,src){
-    var t=el.querySelector('.thumb'); if(!t||t.classList.contains('has-photo')) return;
-    var img=new Image(); img.referrerPolicy='no-referrer';
-    img.onload=function(){ img.className='photo'; t.insertBefore(img,t.firstChild); t.classList.add('has-photo'); };
-    img.src=src;
+    document.getElementById('menu').innerHTML=blocks.length?('<div class="search-head">“'+esc(q)+'” için '+blocks.length+' gün bulundu</div>'+blocks.join('')):('<div class="noresult">“'+esc(q)+'” için sonuç bulunamadı.</div>');
   }
 
   showDay(pickDefault(), false);

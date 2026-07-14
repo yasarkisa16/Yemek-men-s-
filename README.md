@@ -6,7 +6,8 @@ bir web sitesine dönüştüren Google Apps Script projesi.
 
 - 📅 Tarih seçici + "Bugün" butonu + ileri/geri gün okları (‹ ›)
 - 📖 **Tek gün görünümü**: hangi tarihi seçerseniz yalnızca o günün listesi açılır
-- 🖼️ Her yemeğin fotoğrafı **Türkçe Wikipedia'dan otomatik** bulunur (ör. İskender → İskender fotoğrafı). Bulunamazsa şık bir kategori simgesi gösterilir — asla alakasız resim çıkmaz.
+- 🔥 Her yemeğin yanında **kalori değeri** (yemek tipine göre, porsiyon başına yaklaşık)
+- 🎨 Her yemekte şık, renkli bir **kategori ikonu** (çorba/et/pilav/tatlı…)
 - 🔎 Yemek arama (tüm günlerde)
 - 📱 Telefon / tablet / bilgisayar uyumlu
 - ⚡ Veriler E-Tablo'dan **canlı** çekilir — tabloyu güncellediğinizde site de güncellenir
@@ -91,34 +92,29 @@ Buraya eklemediğiniz yemekler için görsel, adına göre otomatik bulunur.
 
 ---
 
-## 🖼️ Görseller nasıl geliyor? (otomatik, alakasız resim yok)
+## 🎨 Görseller ve 🔥 kaloriler
 
-Fotoğraflar **ziyaretçinin tarayıcısında** Türkçe Wikipedia'dan çekilir. Sıralama:
+**Görsel:** İnternetten fotoğraf çekme denendi ama alakasız sonuçlar veriyordu
+(rastgele fotoğraf servisleri). Bu yüzden artık her yemekte, kategorisine göre
+renkli ve şık bir **ikon** (🍲 çorba, 🍢 et, 🍚 pilav, 🥗 salata, 🍮 tatlı, 🥛 içecek…)
+gösteriliyor. Temiz, hızlı ve her zaman tutarlı.
 
-1. **IMAGE_OVERRIDES** — o yemek için elle link yazdıysanız o kullanılır.
-2. **Türkçe Wikipedia** — yemeğin adı akıllı bir eşlemeyle Wikipedia'da aranır ve o
-   yemeğin **gerçek fotoğrafı** gösterilir (ör. `MERCİMEK ÇORBA` → *Mercimek çorbası*,
-   `İSKENDER KEBAP` → *İskender kebap*). Aynı yemek bir kere yüklenince önbelleğe alınır.
-3. **Kategori simgesi** — Wikipedia'da fotoğraf yoksa, rastgele/alakasız resim yerine
-   yemeğin kategorisine göre renkli, şık bir emoji karesi (🍲 çorba, 🍢 et, 🍮 tatlı…)
-   gösterilir.
+**Kalori:** Her yemeğin yanında **porsiyon başına yaklaşık** kalori değeri yazar.
+Değer şöyle belirlenir:
+1. `CONFIG.CALORIE_OVERRIDES` — o yemek için elle değer yazdıysan o kullanılır.
+2. **Yemek adı** — yaygın yemekler için isabetli değer (ör. İskender ≈ 650, ayran ≈ 60).
+3. **Kategori** — ikisi de yoksa yemek tipine göre tipik değer (çorba ≈ 120, salata ≈ 70…).
 
-> Önceki sürümde fotoğraflar loremflickr'den (rastgele Flickr etiketi) geliyordu; bu
-> yüzden fiş/sokak/kalabalık gibi **alakasız** resimler çıkıyordu. Artık kaynak
-> Wikipedia; bulunamazsa temiz bir simge — bir daha alakasız resim görünmez.
-
-Bir yemeğin fotoğrafı yine de yanlış çıkarsa, sadece o yemeği `CONFIG.IMAGE_OVERRIDES`'a
-ekleyip doğru linki verin:
+Bir yemeğin kalorisini değiştirmek istersen `CONFIG.CALORIE_OVERRIDES`'a ekle:
 ```js
-IMAGE_OVERRIDES: {
-  'PİLİÇ BAGET': 'https://siteniz.com/pilic-baget.jpg'
+CALORIE_OVERRIDES: {
+  'İSKENDER KEBAP': 620,
+  'ÇİKOLATALI SPOONFUL': 280
 }
 ```
+Kalori sütununu tümüyle kapatmak için `CONFIG.SHOW_CALORIES: false` yap.
 
-> Teknik not: Fotoğraflar `<img>` ile ziyaretçinin tarayıcısında `wikipedia.org` /
-> `wikimedia.org` üzerinden yüklenir; sunucu tarafında ek izin/istek gerekmez.
-> (Çok nadir kurumsal ağlarda bu adresler engelliyse otomatik olarak kategori
-> simgesine düşer.)
+> Not: Kalori değerleri **yaklaşık** tahminlerdir; porsiyon ve tarife göre değişir.
 
 ---
 

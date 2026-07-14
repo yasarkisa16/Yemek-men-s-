@@ -1,6 +1,5 @@
 <script>
   var STATE = { data: null, days: [], idx: {}, curIso: null };
-  var PHOTO_CACHE = {}; // sorgu -> url ('' = bulunamadı)
 
   var MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
   var MONTHS_SHORT = ['OCA','ŞUB','MAR','NİS','MAY','HAZ','TEM','AĞU','EYL','EKİ','KAS','ARA'];
@@ -59,18 +58,16 @@
   function showDay(iso, scroll) {
     if (STATE.idx[iso] === undefined) return;
     STATE.curIso = iso;
-    var d = STATE.days[STATE.idx[iso]];
+    var i = STATE.idx[iso], d = STATE.days[i];
 
     var sel = document.getElementById('dateSelect');
     if (sel.value !== iso) sel.value = iso;
 
-    var i = STATE.idx[iso];
     var hasPrev = i > 0, hasNext = i < STATE.days.length - 1;
     var isToday = iso === STATE.data.today;
 
-    var menu = document.getElementById('menu');
-    menu.innerHTML =
-      '<section class="day open">' +
+    document.getElementById('menu').innerHTML =
+      '<section class="day">' +
         '<div class="day-head">' +
           '<span class="day-date"><span class="d">' + d.day + '</span><span class="m">' + (MONTHS_SHORT[d.month - 1] || '') + '</span></span>' +
           '<div class="day-title"><span class="wd">' + escapeHtml(d.weekday) +
@@ -81,31 +78,32 @@
             '<button class="navbtn" id="nextDay" ' + (hasNext ? '' : 'disabled') + ' aria-label="Sonraki gün">›</button>' +
           '</div>' +
         '</div>' +
-        '<div class="dishes">' + (d.dishes.length ? d.dishes.map(dishHtml).join('') : '<div class="empty-day">Bu gün için menü girilmemiş.</div>') + '</div>' +
+        '<div class="dishes">' +
+          (d.dishes.length ? d.dishes.map(dishHtml).join('') : '<div class="empty-day">Bu gün için menü girilmemiş.</div>') +
+        '</div>' +
       '</section>';
 
     if (hasPrev) document.getElementById('prevDay').addEventListener('click', function () { showDay(STATE.days[i - 1].iso, true); });
     if (hasNext) document.getElementById('nextDay').addEventListener('click', function () { showDay(STATE.days[i + 1].iso, true); });
-
-    loadPhotos(menu);
 
     if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function goToToday() { showDay(pickDefault(), true); }
 
-  /* -------------------------- YEMEK KARTI -------------------------- */
+  /* -------------------------- YEMEK SATIRI -------------------------- */
 
   function dishHtml(dish) {
     var g = gradientFor(dish.tag);
-    return '<div class="dish" data-name="' + escapeHtml(trLower(dish.pretty)) + '"' +
-             ' data-q="' + escapeHtml(dishQuery(dish.name)) + '"' +
-             ' data-override="' + escapeHtml(dish.override || '') + '">' +
-      '<div class="thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
-        '<span class="emoji">' + escapeHtml(dish.emoji || '🍽️') + '</span>' +
-        '<span class="cat">' + escapeHtml((dish.emoji || '') + ' ' + dish.category) + '</span>' +
-      '</div>' +
-      '<div class="name">' + escapeHtml(dish.pretty || dish.name) + '</div>' +
+    var kcal = (dish.kcal != null)
+      ? '<span class="kcal" title="Yaklaşık kalori (porsiyon başına)">≈ ' + dish.kcal + '<small>kcal</small></span>'
+      : '';
+    return '<div class="dish">' +
+      '<span class="icon" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' + escapeHtml(dish.emoji || '🍽️') + '</span>' +
+      '<div class="info">' +
+        '<span class="dname">' + escapeHtml(dish.pretty || dish.name) + '</span>' +
+        '<span class="dcat">' + escapeHtml(dish.category) + '</span>' +
+      '</div>' + kcal +
     '</div>';
   }
 
@@ -120,110 +118,18 @@
     return m[tag] || ['#c99a5a', '#a9793a'];
   }
 
-  /* -------------------------- FOTOĞRAF (Wikipedia) -------------------------- */
-
-  function loadPhotos(root) {
-    Array.prototype.forEach.call(root.querySelectorAll('.dish'), function (el) {
-      loadPhoto(el);
-    });
-  }
-
-  function loadPhoto(dishEl) {
-    if (dishEl.getAttribute('data-loaded')) return;
-    dishEl.setAttribute('data-loaded', '1');
-
-    var override = dishEl.getAttribute('data-override');
-    if (override) { setPhoto(dishEl, override); return; }
-    if (!window.fetch) return;
-
-    var q = dishEl.getAttribute('data-q');
-    if (!q) return;
-
-    if (PHOTO_CACHE[q] !== undefined) {
-      if (PHOTO_CACHE[q]) setPhoto(dishEl, PHOTO_CACHE[q]);
-      return;
-    }
-
-    var api = 'https://tr.wikipedia.org/w/api.php?action=query&format=json&origin=*' +
-      '&generator=search&gsrsearch=' + encodeURIComponent(q) + '&gsrlimit=1&gsrnamespace=0' +
-      '&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1';
-
-    fetch(api).then(function (r) { return r.json(); }).then(function (d) {
-      var src = '';
-      var pages = d && d.query && d.query.pages;
-      if (pages) { for (var k in pages) { var p = pages[k]; if (p.thumbnail && p.thumbnail.source) { src = p.thumbnail.source; break; } } }
-      PHOTO_CACHE[q] = src;
-      if (src) setPhoto(dishEl, src);
-    }).catch(function () { PHOTO_CACHE[q] = ''; });
-  }
-
-  function setPhoto(dishEl, src) {
-    var t = dishEl.querySelector('.thumb');
-    if (!t || t.classList.contains('has-photo')) return;
-    var img = new Image();
-    img.referrerPolicy = 'no-referrer';
-    img.onload = function () {
-      img.className = 'photo';
-      t.insertBefore(img, t.firstChild);
-      t.classList.add('has-photo');
-    };
-    img.src = src;
-  }
-
-  /**
-   * Yemek adını iyi bir Wikipedia arama sorgusuna çevirir.
-   * Önce bilinen yemekler için elle eşleme, sonra sıfat ayıklama.
-   */
-  function dishQuery(name) {
-    var n = trLower(name);
-    var map = [
-      ['ezogelin', 'ezogelin çorbası'], ['mercimek', 'mercimek çorbası'],
-      ['düğün çorba', 'düğün çorbası'], ['tavuksuyu', 'tavuk suyu çorbası'], ['tavuk suyu', 'tavuk suyu çorbası'],
-      ['yoğurt çorba', 'yayla çorbası'], ['yayla', 'yayla çorbası'], ['domates çorba', 'domates çorbası'],
-      ['şehriye çorba', 'şehriye çorbası'], ['sebze çorba', 'sebze çorbası'], ['ezo', 'ezogelin çorbası'],
-      ['çiğ köfte', 'çiğ köfte'], ['iskender', 'iskender kebap'], ['musakka', 'musakka'],
-      ['karnıyarık', 'karnıyarık'], ['biftek', 'biftek'], ['schnitzel', 'şnitzel'], ['şinitzel', 'şnitzel'],
-      ['döner', 'döner kebap'], ['kavurma', 'kavurma'], ['saç', 'saç kavurma'],
-      ['baget', 'tavuk baget'], ['piliç', 'ızgara tavuk'], ['tavuk', 'tavuk yemeği'],
-      ['köfte', 'köfte'], ['bulgur', 'bulgur pilavı'], ['pilav', 'pilav'],
-      ['mantı', 'mantı'], ['makarna', 'makarna'], ['erişte', 'erişte'],
-      ['börek', 'su böreği'], ['poğaça', 'poğaça'], ['gözleme', 'gözleme'], ['pide', 'pide'],
-      ['ayran', 'ayran'], ['cacık', 'cacık'], ['yoğurt', 'yoğurt'], ['humus', 'humus'], ['haydari', 'haydari'],
-      ['dondurma', 'dondurma'], ['baklava', 'baklava'], ['sütlaç', 'sütlaç'], ['aşure', 'aşure'],
-      ['kadayıf', 'kadayıf'], ['revani', 'revani'], ['muhallebi', 'muhallebi'], ['kazandibi', 'kazandibi'],
-      ['irmik helva', 'irmik helvası'], ['helva', 'helva'], ['kemalpaşa', 'kemalpaşa tatlısı'],
-      ['kuru fasulye', 'kuru fasulye'], ['taze fasulye', 'taze fasulye'], ['barbunya', 'barbunya pilaki'],
-      ['fasulye', 'kuru fasulye'], ['nohut', 'nohut yemeği'], ['bamya', 'bamya yemeği'],
-      ['türlü', 'türlü'], ['semizotu', 'semizotu yemeği'], ['ıspanak', 'ıspanak yemeği'],
-      ['pırasa', 'pırasa yemeği'], ['mücver', 'mücver'], ['dolma', 'dolma'], ['sarma', 'yaprak sarma'],
-      ['kısır', 'kısır'], ['söğüş', 'söğüş'], ['salata', 'salata'], ['turşu', 'turşu'],
-      ['herse', 'keşkek'], ['keşkek', 'keşkek'], ['çorba', 'çorba']
-    ];
-    for (var i = 0; i < map.length; i++) { if (n.indexOf(map[i][0]) !== -1) return map[i][1]; }
-
-    var strip = ['karışık', 'soslu', 'sade', 'terbiyeli', 'ferah', 'soğuk', 'sıcak', 'fırın', 'fırında',
-      'kasap', 'ev', 'közlenmiş', 'zeytinyağlı', 'etli', 'etsiz', 'taze', 'mevsim', 'çıtır', 'özel',
-      'baharatlı', 'light', 'diyet', 'sebzeli', 'peynirli', 'mantarlı', 'mantar', 'sütlü', 'yoğurtlu',
-      'ekşili', 'arpa', 'şehriyeli', 'mısırlı', 'biberiye', 'göbek', 'yeşil', 'çoban'];
-    var words = n.replace(/&/g, ' ').replace(/\./g, ' ').split(/\s+/).filter(function (w) {
-      return w && strip.indexOf(w) === -1;
-    });
-    return words.join(' ').trim() || n;
-  }
-
   /* -------------------------- ARAMA -------------------------- */
 
   function applySearch(q) {
     q = trLower((q || '').trim());
     if (!q) { showDay(STATE.curIso || pickDefault(), false); return; }
 
-    var menu = document.getElementById('menu');
     var blocks = [];
     STATE.days.forEach(function (d) {
       var matches = d.dishes.filter(function (dish) { return trLower(dish.pretty).indexOf(q) !== -1; });
       if (!matches.length) return;
       blocks.push(
-        '<section class="day open">' +
+        '<section class="day">' +
           '<div class="day-head">' +
             '<span class="day-date"><span class="d">' + d.day + '</span><span class="m">' + (MONTHS_SHORT[d.month - 1] || '') + '</span></span>' +
             '<div class="day-title"><span class="wd">' + escapeHtml(d.weekday) + '</span>' +
@@ -234,11 +140,9 @@
       );
     });
 
-    menu.innerHTML = blocks.length
+    document.getElementById('menu').innerHTML = blocks.length
       ? '<div class="search-head">“' + escapeHtml(q) + '” için ' + blocks.length + ' gün bulundu</div>' + blocks.join('')
       : '<div class="noresult">“' + escapeHtml(q) + '” için sonuç bulunamadı.</div>';
-
-    if (blocks.length) loadPhotos(menu);
   }
 
   /* -------------------------- YARDIMCILAR -------------------------- */

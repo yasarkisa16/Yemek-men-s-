@@ -196,51 +196,44 @@
   .navbtn:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
 
   .dishes {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 14px;
-    padding: 18px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 18px 20px;
   }
   .dish {
-    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    background: var(--card);
     border: 1px solid var(--line);
     border-radius: 14px;
-    overflow: hidden;
-    transition: transform .12s ease, box-shadow .12s ease;
+    transition: transform .1s ease, box-shadow .1s ease, border-color .1s ease;
   }
-  .dish:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-  .dish .thumb {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
+  .dish:hover { transform: translateY(-1px); box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--brand) 35%, var(--line)); }
+  .dish .icon {
+    width: 52px; height: 52px; flex: none;
+    border-radius: 13px;
     display: grid; place-items: center;
+    font-size: 27px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), 0 2px 6px rgba(29,36,51,.12);
   }
-  .dish .thumb .emoji { font-size: 52px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.28)); }
-  .dish .thumb .photo {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .dish .thumb.has-photo { background: #eef1ec !important; }
-  .dish .thumb.has-photo .emoji { display: none; }
-  .dish .cat {
-    position: absolute;
-    top: 8px; left: 8px;
-    background: rgba(29, 36, 51, .78);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 8px;
+  .dish .info { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .dish .dname { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .dish .dcat { font-size: 12px; color: var(--muted); }
+  .dish .kcal {
+    flex: none;
+    display: inline-flex; align-items: baseline; gap: 3px;
+    font-size: 15px; font-weight: 800;
+    color: var(--brand-600);
+    background: color-mix(in srgb, var(--brand) 15%, var(--card));
+    border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--line));
+    padding: 6px 12px;
     border-radius: 999px;
-    backdrop-filter: blur(3px);
+    font-variant-numeric: tabular-nums;
   }
-  .dish .name {
-    padding: 10px 12px 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-  }
+  .dish .kcal small { font-size: 10px; font-weight: 700; color: var(--muted); }
 
   .empty-day { padding: 8px 4px 6px; color: var(--muted); font-size: 14px; }
 
@@ -271,7 +264,9 @@
 
   @media (max-width: 480px) {
     .day-head { padding: 14px 14px; gap: 10px; }
-    .dishes { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); padding: 4px 14px 18px; }
+    .dishes { padding: 14px; }
+    .dish .icon { width: 46px; height: 46px; font-size: 24px; }
+    .dish .kcal { font-size: 14px; padding: 5px 10px; }
     select#dateSelect { min-width: 180px; }
   }
 </style>

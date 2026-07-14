@@ -31,12 +31,14 @@ var CONFIG = {
   // Menü verisi kaç dakika önbellekte tutulsun? (hız için). 0 = kapalı.
   CACHE_MINUTES: 30,
 
-  // Otomatik bulunan fotoğrafı beğenmediğin YEMEK için buraya kendi linkini yaz;
-  // o yemek için Wikipedia araması yerine bu link kullanılır.
+  // Her yemeğin yanında kalori değeri gösterilsin mi?
+  SHOW_CALORIES: true,
+
+  // Belirli bir yemeğin kalorisini elle ayarlamak istersen buraya yaz (porsiyon başına).
   // Anahtar = E-Tablodaki yemek adı (büyük/küçük harf önemsiz).
-  // Örn: 'İSKENDER KEBAP': 'https://ornek.com/iskender.jpg'
-  IMAGE_OVERRIDES: {
-    // 'İSKENDER KEBAP': 'https://.../iskender.jpg',
+  // Örn: 'İSKENDER KEBAP': 650
+  CALORIE_OVERRIDES: {
+    // 'İSKENDER KEBAP': 650,
   },
 
   // Saat dilimi (Bugün butonu için)
@@ -72,7 +74,7 @@ function include(name) {
 function getMenuData() {
   var data;
   var cache = null;
-  var key = 'menu_v4_' + CONFIG.SPREADSHEET_ID + '_' + (CONFIG.SHEET_NAME || 'first');
+  var key = 'menu_v5_' + CONFIG.SPREADSHEET_ID + '_' + (CONFIG.SHEET_NAME || 'first');
 
   if (CONFIG.CACHE_MINUTES > 0) {
     try {
@@ -212,11 +214,7 @@ function parseTurkishDate(value) {
 
 /** -------------------------- YEMEK + GÖRSEL ----------------------------- */
 
-/**
- * Bir yemek adından tam yemek nesnesi üretir.
- * Görsel, istemci (tarayıcı) tarafında Wikipedia'dan yüklenir; burada sadece
- * kategori/emoji ve (varsa) elle verilmiş görsel linki (override) gönderilir.
- */
+/** Bir yemek adından tam yemek nesnesi üretir (kategori, emoji, kalori) */
 function makeDish(name) {
   var cat = categorize(name);
   return {
@@ -224,18 +222,64 @@ function makeDish(name) {
     pretty: toTitleTr(name),
     category: cat.label,
     emoji: cat.emoji,
-    tag: cat.tag,                 // kategori rengi + arama için
-    override: overrideFor(name)   // '' ise Wikipedia'dan aranır
+    tag: cat.tag,      // kategori rengi (istemcide ikon rengi için)
+    kcal: CONFIG.SHOW_CALORIES ? calorieFor(name, cat.tag) : null
   };
 }
 
-/** IMAGE_OVERRIDES içinde (büyük/küçük harf duyarsız) eşleşme arar */
-function overrideFor(name) {
-  var ov = CONFIG.IMAGE_OVERRIDES || {};
-  if (ov[name]) return ov[name];
+/** Kategoriye göre yaklaşık kalori (porsiyon başına, kcal) */
+var CATEGORY_KCAL = {
+  soup: 120, kebab: 360, rice: 270, pasta: 320, pastry: 300, dessert: 340,
+  salad: 70, pickles: 20, vegetable: 170, ayran: 70, yogurt: 90, hummus: 170,
+  bread: 90, 'turkish-food': 220
+};
+
+/**
+ * Bazı yaygın yemekler için daha isabetli kalori (porsiyon başına, kcal).
+ * İlk eşleşen kazanır -> ÇORBALAR en üstte, ki "TAVUKSUYU ÇORBA" gibi adlar
+ * yanlışlıkla "tavuk" (et) sayılmasın.
+ */
+var KCAL_KEYWORDS = [
+  // Çorbalar (önce)
+  ['mercimek çorba', 150], ['ezogelin', 140], ['düğün çorba', 160], ['yoğurt çorba', 150],
+  ['yayla', 150], ['tavuksuyu', 90], ['tavuk suyu', 90], ['terbiyeli', 140],
+  ['domates çorba', 130], ['şehriye çorba', 130], ['sebze çorba', 100], ['soğuk çorba', 90],
+  ['çorba', 120],
+  // Tatlılar
+  ['baklava', 380], ['künefe', 450], ['kadayıf', 380], ['tulumba', 360], ['sütlaç', 220],
+  ['muhallebi', 200], ['kazandibi', 260], ['aşure', 250], ['dondurma', 200], ['revani', 340],
+  ['irmik helva', 360], ['helva', 360], ['profiterol', 380], ['trileçe', 330],
+  ['kemalpaşa', 340], ['spoonful', 300], ['çikolatalı', 320], ['tatlı', 320],
+  // Ana yemek / et
+  ['iskender', 650], ['döner', 520], ['lahmacun', 300], ['pizza', 450], ['adana', 480],
+  ['urfa', 470], ['şiş', 380], ['fırın köfte', 340], ['izgara köfte', 320], ['çiğ köfte', 180],
+  ['köfte', 320], ['musakka', 300], ['karnıyarık', 300], ['saç kavurma', 380], ['kavurma', 400],
+  ['güveç', 280], ['schnitzel', 400], ['şnitzel', 400], ['biftek', 350], ['bonfile', 380],
+  ['tavuk sote', 300], ['tavuk', 300], ['piliç', 300], ['baget', 320], ['kanat', 350],
+  // Etli sebze / bakliyat / zeytinyağlı
+  ['etli nohut', 260], ['kuru fasulye', 280], ['barbunya', 250], ['taze fasulye', 130],
+  ['nohut', 240], ['bamya', 120], ['türlü', 160], ['semizotu', 110], ['ıspanak', 120],
+  ['pırasa', 120], ['kabak', 120], ['bezelye', 150], ['dolma', 220], ['sarma', 200],
+  ['mücver', 240], ['imambayıldı', 220], ['zeytinyağlı', 150], ['etli', 300],
+  // Pilav / makarna / hamur işi
+  ['mantı', 350], ['makarna', 320], ['erişte', 300], ['lazanya', 380], ['su böreği', 320],
+  ['börek', 320], ['poğaça', 260], ['gözleme', 300], ['pide', 350], ['bulgur', 250], ['pilav', 270],
+  // Süt / meze / yan
+  ['ayran', 60], ['cacık', 90], ['kefir', 70], ['şıra', 120], ['yoğurt', 90], ['humus', 180],
+  ['haydari', 150], ['ezme', 90], ['söğüş', 30], ['salata', 60], ['turşu', 20],
+  ['herse', 250], ['keşkek', 260], ['kısır', 180]
+];
+
+/** Bir yemek için kalori değeri: önce override, sonra kelime, sonra kategori */
+function calorieFor(name, tag) {
+  var ov = CONFIG.CALORIE_OVERRIDES || {};
+  if (ov[name] != null) return ov[name];
   var norm = trLower(name);
   for (var k in ov) { if (trLower(k) === norm) return ov[k]; }
-  return '';
+  for (var i = 0; i < KCAL_KEYWORDS.length; i++) {
+    if (norm.indexOf(KCAL_KEYWORDS[i][0]) !== -1) return KCAL_KEYWORDS[i][1];
+  }
+  return CATEGORY_KCAL[tag] || 200;
 }
 
 /**
