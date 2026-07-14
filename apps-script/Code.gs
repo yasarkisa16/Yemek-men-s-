@@ -31,13 +31,8 @@ var CONFIG = {
   // Menü verisi kaç dakika önbellekte tutulsun? (hız için). 0 = kapalı.
   CACHE_MINUTES: 30,
 
-  // Her yemeğin fotoğrafını Türkçe Wikipedia'da otomatik arayıp bul.
-  // true  = yemek adına göre GERÇEK fotoğraf (ör. İskender -> İskender fotoğrafı)
-  // false = sadece kategoriye göre temsili fotoğraf (loremflickr)
-  USE_WIKIPEDIA_IMAGES: true,
-
   // Otomatik bulunan fotoğrafı beğenmediğin YEMEK için buraya kendi linkini yaz;
-  // o yemek için otomatik arama yerine bu link kullanılır.
+  // o yemek için Wikipedia araması yerine bu link kullanılır.
   // Anahtar = E-Tablodaki yemek adı (büyük/küçük harf önemsiz).
   // Örn: 'İSKENDER KEBAP': 'https://ornek.com/iskender.jpg'
   IMAGE_OVERRIDES: {
@@ -158,19 +153,6 @@ function buildMenuData() {
     });
   }
 
-  // 2.5) Görselleri topluca çöz: her yemek için internetten gerçek fotoğraf bul
-  var tagByName = {};
-  days.forEach(function (d) {
-    d.dishes.forEach(function (dish) { tagByName[dish.name] = dish.tag; });
-  });
-  var imgByName = resolveImages(Object.keys(tagByName), tagByName);
-  days.forEach(function (d) {
-    d.dishes.forEach(function (dish) {
-      dish.imageUrl = imgByName[dish.name] || loremUrl(dish.name, dish.tag);
-      delete dish.tag; // istemciye gönderilmesine gerek yok
-    });
-  });
-
   // 3) Tarihe göre sırala
   days.sort(function (a, b) { return a.iso < b.iso ? -1 : (a.iso > b.iso ? 1 : 0); });
 
@@ -230,7 +212,11 @@ function parseTurkishDate(value) {
 
 /** -------------------------- YEMEK + GÖRSEL ----------------------------- */
 
-/** Bir yemek adından tam yemek nesnesi üretir (görsel sonra atanır) */
+/**
+ * Bir yemek adından tam yemek nesnesi üretir.
+ * Görsel, istemci (tarayıcı) tarafında Wikipedia'dan yüklenir; burada sadece
+ * kategori/emoji ve (varsa) elle verilmiş görsel linki (override) gönderilir.
+ */
 function makeDish(name) {
   var cat = categorize(name);
   return {
@@ -238,72 +224,9 @@ function makeDish(name) {
     pretty: toTitleTr(name),
     category: cat.label,
     emoji: cat.emoji,
-    tag: cat.tag,     // görsel çözümlemesi için (istemciye gitmez)
-    imageUrl: ''      // resolveImages() ile doldurulur
+    tag: cat.tag,                 // kategori rengi + arama için
+    override: overrideFor(name)   // '' ise Wikipedia'dan aranır
   };
-}
-
-/**
- * Bir grup yemek adı için görsel URL'lerini toplu çözer.
- * Öncelik: 1) IMAGE_OVERRIDES  2) önbellek  3) Türkçe Wikipedia fotoğrafı
- *          4) kategoriye göre loremflickr (yedek)
- * Ağ istekleri UrlFetchApp.fetchAll ile paralel yapılır (hızlı).
- */
-function resolveImages(names, tagByName) {
-  var result = {};
-  var cache = null;
-  try { cache = CacheService.getScriptCache(); } catch (e) {}
-
-  var toFetch = [];
-  names.forEach(function (name) {
-    var ov = overrideFor(name);
-    if (ov) { result[name] = ov; return; }
-    if (!CONFIG.USE_WIKIPEDIA_IMAGES) { result[name] = loremUrl(name, tagByName[name]); return; }
-    var c = null;
-    if (cache) { try { c = cache.get('img_v1_' + trLower(name)); } catch (e) {} }
-    if (c) { result[name] = c; return; }
-    toFetch.push(name);
-  });
-
-  if (!toFetch.length) return result;
-
-  var toCache = {};
-  var CHUNK = 40; // fetchAll'ı makul parçalara böl
-  for (var s = 0; s < toFetch.length; s += CHUNK) {
-    var slice = toFetch.slice(s, s + CHUNK);
-    var requests = slice.map(function (name) {
-      return {
-        url: wikiSearchUrl(name),
-        method: 'get',
-        muteHttpExceptions: true,
-        headers: { 'User-Agent': 'ValeoYemekMenusu/1.0 (Google Apps Script)' }
-      };
-    });
-    var responses = [];
-    try { responses = UrlFetchApp.fetchAll(requests); } catch (e) { responses = []; }
-
-    for (var i = 0; i < slice.length; i++) {
-      var name = slice[i], url = '';
-      try {
-        var r = responses[i];
-        if (r && r.getResponseCode() === 200) url = extractWikiThumb(r.getContentText());
-      } catch (e) {}
-      if (!url) url = loremUrl(name, tagByName[name]); // yedek
-      result[name] = url;
-      toCache['img_v1_' + trLower(name)] = url;
-    }
-  }
-
-  // Önbelleğe yaz (6 saat), 90'lık gruplar halinde
-  if (cache) {
-    var keys = Object.keys(toCache);
-    for (var p = 0; p < keys.length; p += 90) {
-      var obj = {};
-      keys.slice(p, p + 90).forEach(function (k) { obj[k] = toCache[k]; });
-      try { cache.putAll(obj, 21600); } catch (e) {}
-    }
-  }
-  return result;
 }
 
 /** IMAGE_OVERRIDES içinde (büyük/küçük harf duyarsız) eşleşme arar */
@@ -313,42 +236,6 @@ function overrideFor(name) {
   var norm = trLower(name);
   for (var k in ov) { if (trLower(k) === norm) return ov[k]; }
   return '';
-}
-
-/** Türkçe Wikipedia'da yemek adını arayıp ilk sonucun küçük görselini isteyen URL */
-function wikiSearchUrl(name) {
-  var params = {
-    action: 'query', format: 'json',
-    generator: 'search', gsrsearch: cleanQuery(name), gsrlimit: '1', gsrnamespace: '0',
-    prop: 'pageimages', piprop: 'thumbnail', pithumbsize: '400', redirects: '1'
-  };
-  var parts = [];
-  for (var k in params) parts.push(k + '=' + encodeURIComponent(params[k]));
-  return 'https://tr.wikipedia.org/w/api.php?' + parts.join('&');
-}
-
-/** Arama sorgusunu temizle ("DOM.GÖBEK", "ISPANAK & YOĞURT" gibi ekleri sadeleştir) */
-function cleanQuery(name) {
-  return String(name).replace(/&/g, ' ').replace(/\./g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-/** Wikipedia API yanıtından küçük görsel (thumbnail) URL'sini çıkarır */
-function extractWikiThumb(text) {
-  var data;
-  try { data = JSON.parse(text); } catch (e) { return ''; }
-  if (!data || !data.query || !data.query.pages) return '';
-  var pages = data.query.pages;
-  for (var k in pages) {
-    var p = pages[k];
-    if (p && p.thumbnail && p.thumbnail.source) return p.thumbnail.source;
-  }
-  return '';
-}
-
-/** Yedek görsel: kategoriye göre loremflickr (aynı yemek hep aynı fotoğrafı gösterir) */
-function loremUrl(name, tag) {
-  var lock = (hashCode(trLower(name)) % 1000) + 1;
-  return 'https://loremflickr.com/320/240/' + encodeURIComponent(tag || 'turkish-food') + '?lock=' + lock;
 }
 
 /**
@@ -435,14 +322,4 @@ function weekdayFromIso(iso) {
   var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
   var days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
   return days[d.getDay()];
-}
-
-/** Basit deterministik hash (görsel kilidi için) */
-function hashCode(s) {
-  var h = 0;
-  for (var i = 0; i < s.length; i++) {
-    h = ((h << 5) - h) + s.charCodeAt(i);
-    h |= 0;
-  }
-  return Math.abs(h);
 }

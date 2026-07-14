@@ -1,13 +1,13 @@
 # 🍽️ Firma Yemek Menüsü — Google Apps Script Sitesi
 
 Google E-Tablo'daki (Excel benzeri) yemek listenizi, ziyaretçilerin **tarih seçince
-menünün aşağı doğru açıldığı**, yemeklerin yanında **görsellerin göründüğü** şık bir
-web sitesine dönüştüren Google Apps Script projesi.
+o günün menüsünün açıldığı**, yemeklerin yanında **gerçek fotoğrafların göründüğü** şık
+bir web sitesine dönüştüren Google Apps Script projesi.
 
-- 📅 Tarih seçici + "Bugün" butonu
-- 🔽 Accordion: seçilen günün menüsü aşağı açılır
-- 🖼️ Her yemeğin yanında otomatik görsel (internetten, anahtar kelimeye göre)
-- 🔎 Yemek arama
+- 📅 Tarih seçici + "Bugün" butonu + ileri/geri gün okları (‹ ›)
+- 📖 **Tek gün görünümü**: hangi tarihi seçerseniz yalnızca o günün listesi açılır
+- 🖼️ Her yemeğin fotoğrafı **Türkçe Wikipedia'dan otomatik** bulunur (ör. İskender → İskender fotoğrafı). Bulunamazsa şık bir kategori simgesi gösterilir — asla alakasız resim çıkmaz.
+- 🔎 Yemek arama (tüm günlerde)
 - 📱 Telefon / tablet / bilgisayar uyumlu
 - ⚡ Veriler E-Tablo'dan **canlı** çekilir — tabloyu güncellediğinizde site de güncellenir
 
@@ -17,7 +17,7 @@ web sitesine dönüştüren Google Apps Script projesi.
 
 | Dosya | Ne işe yarar |
 |-------|--------------|
-| `apps-script/Code.gs` | Sunucu tarafı: E-Tabloyu okur, menüyü ayrıştırır, görsel üretir |
+| `apps-script/Code.gs` | Sunucu tarafı: E-Tabloyu okur, menüyü ayrıştırır, kategorilere ayırır |
 | `apps-script/Index.html` | Ana sayfa iskeleti |
 | `apps-script/Stylesheet.html` | Tasarım (CSS) |
 | `apps-script/JavaScript.html` | Arayüz davranışı (accordion, arama, görsel yedekleme) |
@@ -91,30 +91,34 @@ Buraya eklemediğiniz yemekler için görsel, adına göre otomatik bulunur.
 
 ---
 
-## 🖼️ Görseller nasıl geliyor? (otomatik)
+## 🖼️ Görseller nasıl geliyor? (otomatik, alakasız resim yok)
 
-Her yemeğin fotoğrafı **internetten otomatik** bulunur. Sıralama şöyledir:
+Fotoğraflar **ziyaretçinin tarayıcısında** Türkçe Wikipedia'dan çekilir. Sıralama:
 
 1. **IMAGE_OVERRIDES** — o yemek için elle link yazdıysanız o kullanılır.
-2. **Türkçe Wikipedia** — yemeğin adı Wikipedia'da aranıp o yemeğin **gerçek
-   fotoğrafı** getirilir (ör. `İSKENDER KEBAP` → İskender fotoğrafı,
-   `AŞURE` → aşure fotoğrafı). Sonuçlar 6 saat önbelleğe alınır, hızlıdır.
-3. **loremflickr (yedek)** — Wikipedia'da fotoğraf yoksa, yemeğin kategorisine
-   (çorba/kebap/pilav/salata/tatlı…) uygun temsili bir fotoğraf gösterilir.
-4. **Emoji yer tutucu** — hiçbiri yüklenmezse kırık görsel yerine şık bir simge.
+2. **Türkçe Wikipedia** — yemeğin adı akıllı bir eşlemeyle Wikipedia'da aranır ve o
+   yemeğin **gerçek fotoğrafı** gösterilir (ör. `MERCİMEK ÇORBA` → *Mercimek çorbası*,
+   `İSKENDER KEBAP` → *İskender kebap*). Aynı yemek bir kere yüklenince önbelleğe alınır.
+3. **Kategori simgesi** — Wikipedia'da fotoğraf yoksa, rastgele/alakasız resim yerine
+   yemeğin kategorisine göre renkli, şık bir emoji karesi (🍲 çorba, 🍢 et, 🍮 tatlı…)
+   gösterilir.
 
-> Bu sayede menüdeki **tüm yemekler** — şu an göremediklerim ve gelecek aylarda
-> ekleyecekleriniz dahil — kendi fotoğrafını otomatik alır. Elle tek tek liste
-> tutmanıza gerek yoktur.
+> Önceki sürümde fotoğraflar loremflickr'den (rastgele Flickr etiketi) geliyordu; bu
+> yüzden fiş/sokak/kalabalık gibi **alakasız** resimler çıkıyordu. Artık kaynak
+> Wikipedia; bulunamazsa temiz bir simge — bir daha alakasız resim görünmez.
 
-Bir yemeğin otomatik fotoğrafı yanlış/alakasız çıkarsa, sadece o yemeği
-`CONFIG.IMAGE_OVERRIDES`'a ekleyip doğru linki verin — gerisi otomatik kalır.
-Wikipedia aramasını tümüyle kapatmak isterseniz `USE_WIKIPEDIA_IMAGES: false`
-yapın (o zaman yalnızca kategoriye göre temsili fotoğraflar kullanılır).
+Bir yemeğin fotoğrafı yine de yanlış çıkarsa, sadece o yemeği `CONFIG.IMAGE_OVERRIDES`'a
+ekleyip doğru linki verin:
+```js
+IMAGE_OVERRIDES: {
+  'PİLİÇ BAGET': 'https://siteniz.com/pilic-baget.jpg'
+}
+```
 
-> Not: Bu özellik, yayınlanan sitede Google'ın sunucularında çalışır ve internete
-> erişir. (Yemek fotoğrafları ziyaretçinin tarayıcısında `wikipedia.org` /
-> `wikimedia.org` üzerinden yüklenir.)
+> Teknik not: Fotoğraflar `<img>` ile ziyaretçinin tarayıcısında `wikipedia.org` /
+> `wikimedia.org` üzerinden yüklenir; sunucu tarafında ek izin/istek gerekmez.
+> (Çok nadir kurumsal ağlarda bu adresler engelliyse otomatik olarak kategori
+> simgesine düşer.)
 
 ---
 

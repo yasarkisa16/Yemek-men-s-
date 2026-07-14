@@ -1,130 +1,70 @@
 <title>Valeo · Temmuz Yemek Listesi — Önizleme</title>
 <style>
-  /* ===== VALEO marka renkleri: Yeşil #82E600 · Mirage #1D2433 · Beyaz ===== */
+  /* ===== VALEO: Yeşil #82E600 · Mirage #1D2433 · Beyaz ===== */
   :root {
-    --bg: #f3f6f1;
-    --card: #ffffff;
-    --ink: #1d2433;
-    --muted: #6c7482;
-    --brand: #82e600;
-    --brand-600: #5fae00;
-    --dark: #1d2433;
-    --dark-2: #2a3346;
-    --line: #e4e9df;
-    --shadow: 0 10px 34px rgba(29, 36, 51, 0.12);
-    --radius: 16px;
+    --bg: #f3f6f1; --card: #ffffff; --ink: #1d2433; --muted: #6c7482;
+    --brand: #82e600; --brand-600: #5fae00; --dark: #1d2433; --dark-2: #2a3346;
+    --line: #e4e9df; --shadow: 0 10px 34px rgba(29, 36, 51, 0.12); --radius: 16px;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #141a26; --card: #1f2735; --ink: #eef1f5; --muted: #9aa3b2;
-      --line: #2c3546; --shadow: 0 10px 34px rgba(0,0,0,0.5);
-    }
+    :root { --bg:#141a26; --card:#1f2735; --ink:#eef1f5; --muted:#9aa3b2; --line:#2c3546; --shadow:0 10px 34px rgba(0,0,0,0.5); }
   }
-  :root[data-theme="dark"] {
-    --bg: #141a26; --card: #1f2735; --ink: #eef1f5; --muted: #9aa3b2;
-    --line: #2c3546; --shadow: 0 10px 34px rgba(0,0,0,0.5);
-  }
-  :root[data-theme="light"] {
-    --bg: #f3f6f1; --card: #ffffff; --ink: #1d2433; --muted: #6c7482;
-    --line: #e4e9df; --shadow: 0 10px 34px rgba(29,36,51,0.12);
-  }
+  :root[data-theme="dark"] { --bg:#141a26; --card:#1f2735; --ink:#eef1f5; --muted:#9aa3b2; --line:#2c3546; --shadow:0 10px 34px rgba(0,0,0,0.5); }
+  :root[data-theme="light"] { --bg:#f3f6f1; --card:#ffffff; --ink:#1d2433; --muted:#6c7482; --line:#e4e9df; --shadow:0 10px 34px rgba(29,36,51,0.12); }
 
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg); color: var(--ink); line-height: 1.5; -webkit-font-smoothing: antialiased;
-  }
+  body { margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased; }
   .app { max-width: 1040px; margin: 0 auto; padding: 0 16px 60px; }
+  .note { background: color-mix(in srgb, var(--brand) 14%, var(--bg)); border: 1px dashed color-mix(in srgb, var(--brand-600) 55%, var(--line)); color: var(--ink); border-radius: 12px; padding: 10px 14px; font-size: 13px; margin: 14px 0 0; text-align: center; }
 
-  .note {
-    background: color-mix(in srgb, var(--brand) 14%, var(--bg));
-    border: 1px dashed color-mix(in srgb, var(--brand-600) 55%, var(--line));
-    color: var(--ink); border-radius: 12px; padding: 10px 14px; font-size: 13px; margin: 14px 0 0; text-align: center;
-  }
+  .hero { position: relative; background: linear-gradient(135deg,#1d2433 0%,#2a3346 55%,#1d2433 100%); color:#fff; border-radius:0 0 28px 28px; padding:34px 22px 30px; margin:0 -16px 26px; box-shadow:var(--shadow); text-align:center; overflow:hidden; }
+  .hero::before { content:""; position:absolute; top:0; left:0; right:0; height:4px; background:var(--brand); }
+  .hero-inner { max-width:720px; margin:0 auto; position:relative; }
+  .badge { display:inline-block; background:var(--brand); color:var(--dark); padding:6px 14px; border-radius:999px; font-size:13px; font-weight:800; letter-spacing:.4px; margin-bottom:14px; }
+  .hero h1 { margin:4px 0 6px; font-size:clamp(26px,5vw,40px); font-weight:800; letter-spacing:-.5px; text-wrap:balance; }
+  .hero h1::after { content:""; display:block; width:64px; height:4px; background:var(--brand); border-radius:999px; margin:10px auto 0; }
+  .hero .subtitle { margin:6px 0 20px; opacity:.85; font-size:15px; }
+  .controls { display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+  .controls label { font-size:14px; font-weight:600; }
+  select#dateSelect { appearance:none; -webkit-appearance:none;
+    background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231d2433' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 12px center;
+    color:#1d2433; border:none; border-radius:12px; padding:11px 38px 11px 14px; font-size:15px; font-weight:600; min-width:240px; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.18); }
+  button#todayBtn { background:var(--brand); color:var(--dark); border:none; border-radius:12px; padding:11px 18px; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2); }
+  button#todayBtn:active { transform:scale(.96); }
+  input#search { width:100%; max-width:420px; border:none; border-radius:12px; padding:11px 16px; font-size:15px; box-shadow:0 4px 14px rgba(0,0,0,.14); outline:none; color:#1d2433; }
 
-  .hero {
-    position: relative;
-    background: linear-gradient(135deg, #1d2433 0%, #2a3346 55%, #1d2433 100%);
-    color: #fff; border-radius: 0 0 28px 28px; padding: 34px 22px 30px;
-    margin: 0 -16px 26px; box-shadow: var(--shadow); text-align: center; overflow: hidden;
-  }
-  .hero::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--brand); }
-  .hero-inner { max-width: 720px; margin: 0 auto; position: relative; }
-  .badge {
-    display: inline-block; background: var(--brand); color: var(--dark); padding: 6px 14px;
-    border-radius: 999px; font-size: 13px; font-weight: 800; letter-spacing: .4px; margin-bottom: 14px;
-  }
-  .hero h1 { margin: 4px 0 6px; font-size: clamp(26px, 5vw, 40px); font-weight: 800; letter-spacing: -.5px; text-wrap: balance; }
-  .hero h1::after { content: ""; display: block; width: 64px; height: 4px; background: var(--brand); border-radius: 999px; margin: 10px auto 0; }
-  .hero .subtitle { margin: 6px 0 20px; opacity: .85; font-size: 15px; }
-  .controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
-  .controls label { font-size: 14px; font-weight: 600; }
-  select#dateSelect {
-    appearance: none; -webkit-appearance: none;
-    background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231d2433' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 12px center;
-    color: #1d2433; border: none; border-radius: 12px; padding: 11px 38px 11px 14px;
-    font-size: 15px; font-weight: 600; min-width: 240px; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.18);
-  }
-  button#todayBtn {
-    background: var(--brand); color: var(--dark); border: none; border-radius: 12px;
-    padding: 11px 18px; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.2);
-  }
-  button#todayBtn:hover { filter: brightness(1.05); }
-  button#todayBtn:active { transform: scale(.96); }
-  input#search {
-    width: 100%; max-width: 420px; border: none; border-radius: 12px; padding: 11px 16px;
-    font-size: 15px; box-shadow: 0 4px 14px rgba(0,0,0,.14); outline: none; color: #1d2433;
-  }
-  input#search:focus-visible, select#dateSelect:focus-visible, button:focus-visible {
-    outline: 3px solid var(--brand); outline-offset: 2px;
-  }
+  .menu { display:flex; flex-direction:column; gap:14px; }
+  .search-head { font-size:14px; font-weight:700; color:var(--muted); padding:2px 4px; }
+  .day { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+  .day-head { display:flex; align-items:center; gap:14px; padding:18px 20px; border-bottom:1px solid var(--line); }
+  .day-date { display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:58px; background:linear-gradient(135deg,#82e600,#6cc400); color:var(--dark); border-radius:12px; padding:8px 6px; line-height:1.1; }
+  .day-date .d { font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .day-date .m { font-size:11px; text-transform:uppercase; letter-spacing:.5px; opacity:.85; }
+  .day-title { flex:1; display:flex; flex-direction:column; }
+  .day-title .wd { font-size:18px; font-weight:800; }
+  .day-title .sub { font-size:13px; color:var(--muted); }
+  .today-tag { background:var(--brand); color:var(--dark); font-size:11px; font-weight:800; padding:3px 9px; border-radius:999px; margin-left:8px; }
+  .daynav { display:flex; gap:8px; flex:none; }
+  .navbtn { width:40px; height:40px; border:1px solid var(--line); background:#fff; color:var(--brand-600); border-radius:11px; font-size:22px; font-weight:800; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .navbtn:hover:not([disabled]) { background:var(--brand); color:var(--dark); border-color:var(--brand); }
+  .navbtn:active:not([disabled]) { transform:scale(.94); }
+  .navbtn[disabled] { opacity:.35; cursor:not-allowed; }
 
-  .menu { display: flex; flex-direction: column; gap: 14px; }
-  .day {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    overflow: hidden; box-shadow: 0 2px 10px rgba(29,36,51,.05); transition: box-shadow .2s ease, border-color .2s ease;
-  }
-  .day.open { box-shadow: var(--shadow); border-color: var(--brand); }
-  .day-head {
-    display: flex; align-items: center; gap: 14px; width: 100%; background: none; border: none;
-    text-align: left; padding: 18px 20px; cursor: pointer; font-family: inherit; color: inherit;
-  }
-  .day-head:hover { background: color-mix(in srgb, var(--brand) 10%, var(--card)); }
-  .day-date {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 58px;
-    background: linear-gradient(135deg, #82e600, #6cc400); color: var(--dark); border-radius: 12px; padding: 8px 6px; line-height: 1.1;
-  }
-  .day-date .d { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
-  .day-date .m { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; opacity: .85; }
-  .day-title { flex: 1; }
-  .day-title .wd { font-size: 17px; font-weight: 700; }
-  .day-title .sub { font-size: 13px; color: var(--muted); }
-  .chev { width: 26px; height: 26px; flex: none; color: var(--brand-600); transition: transform .25s ease; }
-  .day.open .chev { transform: rotate(180deg); }
-  .today-tag { background: var(--brand); color: var(--dark); font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; margin-left: 8px; }
+  .dishes { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; padding:18px 20px 22px; }
+  .dish { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; transition:transform .12s ease, box-shadow .12s ease; }
+  .dish:hover { transform:translateY(-3px); box-shadow:var(--shadow); }
+  .thumb { position:relative; aspect-ratio:4/3; overflow:hidden; display:grid; place-items:center; }
+  .thumb .emoji { font-size:52px; filter:drop-shadow(0 3px 6px rgba(0,0,0,.28)); }
+  .thumb .photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .thumb.has-photo { background:#eef1ec !important; }
+  .thumb.has-photo .emoji { display:none; }
+  .cat { position:absolute; top:8px; left:8px; background:rgba(29,36,51,.78); color:#fff; font-size:11px; font-weight:600; padding:3px 8px; border-radius:999px; }
+  .dish .name { padding:10px 12px 12px; font-size:14px; font-weight:600; }
+  .noresult { text-align:center; padding:40px 20px; color:var(--muted); }
 
-  .day-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
-  .day.open .day-body { max-height: 4000px; }
-  .dishes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; padding: 4px 20px 22px; }
-  .dish { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; transition: transform .12s ease, box-shadow .12s ease; }
-  .dish:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-  .thumb { position: relative; aspect-ratio: 4 / 3; overflow: hidden; display: grid; place-items: center; }
-  .thumb .emoji { font-size: 54px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
-  .thumb .photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .thumb.has-photo { background: #eef1ec !important; }
-  .thumb.has-photo .emoji { display: none; }
-  .cat { position: absolute; top: 8px; left: 8px; background: rgba(29,36,51,.78); color: #fff; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
-  .dish .name { padding: 10px 12px 12px; font-size: 14px; font-weight: 600; }
-
-  .foot { text-align: center; color: var(--muted); font-size: 12px; margin-top: 30px; }
-
-  @media (max-width: 480px) {
-    .day-head { padding: 14px; gap: 10px; }
-    .dishes { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); padding: 4px 14px 18px; }
-    select#dateSelect { min-width: 180px; }
-  }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .foot { text-align:center; color:var(--muted); font-size:12px; margin-top:30px; }
+  @media (max-width:480px){ .day-head{padding:14px;gap:10px;} .dishes{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));padding:14px;} select#dateSelect{min-width:180px;} }
+  @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
 </style>
 
 <div class="app">
@@ -132,7 +72,7 @@
     <div class="hero-inner">
       <span class="badge">Valeo</span>
       <h1>Temmuz Yemek Listesi</h1>
-      <p class="subtitle">Bir tarih seçin, günün menüsü aşağıda açılsın.</p>
+      <p class="subtitle">Bir tarih seçin, o günün menüsü aşağıda açılsın.</p>
       <div class="controls">
         <label for="dateSelect">Tarih:</label>
         <select id="dateSelect"></select>
@@ -142,158 +82,141 @@
     </div>
   </header>
   <main id="menu" class="menu"></main>
-  <p class="note">Her yemeğin fotoğrafı <strong>Türkçe Wikipedia'dan otomatik</strong> yüklenir. Bu önizleme penceresi güvenlik nedeniyle dış görselleri engellerse kategori simgeleri görünür; <strong>yayınlanan sitede (ve bu dosyayı tarayıcıda açtığınızda) gerçek fotoğraflar</strong> gelir.</p>
-  <footer class="foot">Veriler Google E-Tablo'dan canlı çekilir · Örnek: 1–10 Temmuz 2026</footer>
+  <p class="note">Her yemeğin fotoğrafı <strong>Türkçe Wikipedia'dan otomatik</strong> yüklenir. Bu önizleme penceresi güvenlik nedeniyle dış istekleri engellerse kategori simgeleri kalır; <strong>yayınlanan sitede (ve bu dosyayı tarayıcıda açtığınızda) gerçek fotoğraflar</strong> gelir.</p>
+  <footer class="foot">Örnek veri: 1–10 Temmuz 2026 · Gerçek veriler E-Tablo'dan çekilir.</footer>
 </div>
 
 <script>
-  // Ekran görüntüsündeki Temmuz verileri (örnek)
   var RAW = {
     "2026-07-01": ["EZOGELİN ÇORBA","İSKENDER KEBAP","MEVSİM TÜRLÜ","ARPA ŞEHRİYELİ PİRİNÇ PİLAVI","ISPANAKLI BÖREK","ÇİKOLATALI SPOONFUL","YOĞURT","AYRAN","HUMUS","HAVUÇ SALATA","DOM.GÖBEK SALATA","BİBERİYE TURŞU"],
     "2026-07-02": ["YOĞURT ÇORBA","ETLİ NOHUT","EKŞİLİ BAMYA","SADE PİRİNÇ PİLAVI","SOSLU MAKARNA","SÜT HELVASI","CACIK","HERSE","SOĞAN SÖĞÜŞ","YEŞİL SALATA","KARIŞIK TURŞU"],
-    "2026-07-03": ["DÜĞÜN ÇORBA","SOĞUK ÇORBA","KARIŞIK MUSAKKA","YOĞURTLU SEMİZOTU","SEBZELİ BULGUR PİLAVI","PEYNİRLİ MAKARNA","AŞURE","YOĞURT","AYRAN","ÇİĞ KÖFTE","GÖBEK SALATA","SALATALIK TURŞU","MISIRLI HAVUÇ SALATASI"],
-    "2026-07-06": ["MERCİMEK ÇORBA","FIRIN KÖFTE","ZEYTİNYAĞLI TAZE FASULYE","PİRİNÇ PİLAVI","AYRAN","ÇOBAN SALATA"],
-    "2026-07-07": ["DÜĞÜN ÇORBA","ISPANAK & YOĞURT","TAVUK SOTE","BULGUR PİLAVI","YOĞURT","MEVSİM SALATA"],
-    "2026-07-08": ["TERBİYELİ ŞEHRİYE ÇORBA","SOĞUK ÇORBA","MANTAR SOSLU BİFTEK","SEBZELİ PİLAV","SÜTLAÇ","CACIK","YEŞİL SALATA"],
-    "2026-07-09": ["TAVUKSUYU ÇORBA","KURU FASULYE","PİRİNÇ PİLAVI","TURŞU","AYRAN","ROKA SALATA"],
-    "2026-07-10": ["SEBZE ÇORBA","FERAH SOĞUK ÇORBA","KASAP KÖFTE","ARPA ŞEHRİYELİ PİLAV","BAKLAVA","YOĞURT","KISIR"]
+    "2026-07-03": ["DÜĞÜN ÇORBA","KARIŞIK MUSAKKA","YOĞURTLU SEMİZOTU","SEBZELİ BULGUR PİLAVI","PEYNİRLİ MAKARNA","AŞURE","YOĞURT","AYRAN","ÇİĞ KÖFTE","GÖBEK SALATA","SALATALIK TURŞU"],
+    "2026-07-06": ["MERCİMEK ÇORBA","FIRIN KÖFTE","PİLİÇ BAGET","BULGUR PİLAVI","MANTI","DONDURMA","YOĞURT","AYRAN","ZEYTİNYAĞLI TAZE FASULYE","KARIŞIK YEŞİL SALATA","BAKLAVA"],
+    "2026-07-07": ["DÜĞÜN ÇORBA","TAVUK SOTE","KURU FASULYE","PİRİNÇ PİLAVI","YOĞURT","MEVSİM SALATA"],
+    "2026-07-08": ["TERBİYELİ ŞEHRİYE ÇORBA","MANTAR SOSLU BİFTEK","SÜTLAÇ","CACIK","YEŞİL SALATA","TURŞU"],
+    "2026-07-09": ["TAVUKSUYU ÇORBA","KURU FASULYE","PİRİNÇ PİLAVI","AYRAN","ROKA SALATA","REVANİ"],
+    "2026-07-10": ["SEBZE ÇORBA","KASAP KÖFTE","ARPA ŞEHRİYELİ PİLAV","BAKLAVA","YOĞURT","KISIR"]
   };
+  var TODAY = '2026-07-06';
 
   var MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
   var MONTHS_SHORT = ['OCA','ŞUB','MAR','NİS','MAY','HAZ','TEM','AĞU','EYL','EKİ','KAS','ARA'];
   var WD = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-  var TODAY = '2026-07-08';
+  var PHOTO_CACHE = {};
 
   function trLower(s){ return String(s==null?'':s).replace(/İ/g,'i').replace(/I/g,'ı').toLowerCase(); }
   function trUpperFirst(c){ return c==='i'?'İ':(c==='ı'?'I':c.toUpperCase()); }
-  function toTitleTr(s){ return trLower(s).split(/(\s+)/).map(function(w){ return w.trim()? trUpperFirst(w.charAt(0))+w.slice(1) : w; }).join(''); }
-  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function toTitleTr(s){ return trLower(s).split(/(\s+)/).map(function(w){ return w.trim()?trUpperFirst(w.charAt(0))+w.slice(1):w; }).join(''); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   function categorize(name){
     var n = trLower(name);
     var rules = [
-      { any:['çorba'], grad:['#e07b3c','#c94f1c'], emoji:'🍲', label:'Çorba' },
-      { any:['ayran','cacık','kefir'], grad:['#79b6d6','#4f8fb8'], emoji:'🥛', label:'İçecek' },
-      { any:['yoğurt'], grad:['#cfd6dd','#a7b0ba'], emoji:'🥣', label:'Yoğurt' },
-      { any:['turşu'], grad:['#8fb84f','#6a9433'], emoji:'🥒', label:'Turşu' },
-      { any:['salata','söğüş','kısır'], grad:['#7cbf59','#4f9b3a'], emoji:'🥗', label:'Salata' },
-      { any:['humus','haydari','ezme','meze'], grad:['#d9b56b','#bd923f'], emoji:'🫓', label:'Meze' },
-      { any:['börek','poğaça','pide','gözleme'], grad:['#e0a458','#c47e2b'], emoji:'🥟', label:'Hamur İşi' },
-      { any:['pilav','bulgur','şehriye'], grad:['#e6c887','#cba954'], emoji:'🍚', label:'Pilav' },
-      { any:['makarna','erişte','mantı'], grad:['#e8b96a','#cf9a3d'], emoji:'🍝', label:'Makarna' },
-      { any:['helva','aşure','sütlaç','baklava','tatlı','spoonful','revani','kadayıf','muhallebi'], grad:['#d98cae','#bd5f88'], emoji:'🍮', label:'Tatlı' },
-      { any:['kebap','köfte','iskender','döner','biftek','tavuk','etli','musakka','sote','kavurma'], grad:['#c9502a','#a13417'], emoji:'🍢', label:'Ana Yemek (Et)' },
-      { any:['nohut','fasulye','bamya','türlü','sebze','semizotu','ıspanak','dolma','sarma','mücver','pırasa','kabak','herse','bezelye'], grad:['#8aa84a','#5f8034'], emoji:'🥘', label:'Sebze Yemeği' },
-      { any:['ekmek'], grad:['#d7b483','#b98f52'], emoji:'🍞', label:'Ekmek' }
+      { any:['çorba'], tag:'soup', emoji:'🍲', label:'Çorba' },
+      { any:['ayran','cacık','kefir'], tag:'ayran', emoji:'🥛', label:'İçecek' },
+      { any:['yoğurt'], tag:'yogurt', emoji:'🥣', label:'Yoğurt' },
+      { any:['turşu'], tag:'pickles', emoji:'🥒', label:'Turşu' },
+      { any:['salata','söğüş','kısır'], tag:'salad', emoji:'🥗', label:'Salata' },
+      { any:['humus','haydari','ezme','meze'], tag:'hummus', emoji:'🫓', label:'Meze' },
+      { any:['börek','poğaça','pide','gözleme'], tag:'pastry', emoji:'🥟', label:'Hamur İşi' },
+      { any:['pilav','bulgur','şehriye'], tag:'rice', emoji:'🍚', label:'Pilav' },
+      { any:['makarna','erişte','mantı'], tag:'pasta', emoji:'🍝', label:'Makarna' },
+      { any:['helva','aşure','sütlaç','baklava','tatlı','spoonful','revani','kadayıf','muhallebi','dondurma','sultan'], tag:'dessert', emoji:'🍮', label:'Tatlı' },
+      { any:['kebap','köfte','iskender','döner','biftek','tavuk','piliç','baget','etli','musakka','sote','kavurma'], tag:'kebab', emoji:'🍢', label:'Ana Yemek (Et)' },
+      { any:['nohut','fasulye','bamya','türlü','sebze','semizotu','ıspanak','dolma','sarma','mücver','pırasa','kabak','herse','bezelye'], tag:'vegetable', emoji:'🥘', label:'Sebze Yemeği' },
+      { any:['ekmek'], tag:'bread', emoji:'🍞', label:'Ekmek' }
     ];
-    for (var i=0;i<rules.length;i++) for (var j=0;j<rules[i].any.length;j++)
-      if (n.indexOf(rules[i].any[j])!==-1) return rules[i];
-    return { grad:['#c99a5a','#a9793a'], emoji:'🍽️', label:'Yemek' };
+    for (var i=0;i<rules.length;i++) for (var j=0;j<rules[i].any.length;j++) if (n.indexOf(rules[i].any[j])!==-1) return rules[i];
+    return { tag:'turkish-food', emoji:'🍽️', label:'Yemek' };
+  }
+  function gradientFor(tag){
+    var m={soup:['#e0a35a','#c9711f'],kebab:['#c9502a','#a13417'],rice:['#e6c887','#cba954'],pasta:['#e8b96a','#cf9a3d'],pastry:['#e0a458','#c47e2b'],dessert:['#d98cae','#bd5f88'],salad:['#7cbf59','#4f9b3a'],pickles:['#8fb84f','#6a9433'],vegetable:['#8aa84a','#5f8034'],ayran:['#79b6d6','#4f8fb8'],yogurt:['#cfd6dd','#a7b0ba'],hummus:['#d9b56b','#bd923f'],bread:['#d7b483','#b98f52']};
+    return m[tag]||['#c99a5a','#a9793a'];
+  }
+  function dishQuery(name){
+    var n=trLower(name);
+    var map=[['ezogelin','ezogelin çorbası'],['mercimek','mercimek çorbası'],['düğün çorba','düğün çorbası'],['tavuksuyu','tavuk suyu çorbası'],['yoğurt çorba','yayla çorbası'],['domates çorba','domates çorbası'],['şehriye çorba','şehriye çorbası'],['sebze çorba','sebze çorbası'],['çiğ köfte','çiğ köfte'],['iskender','iskender kebap'],['musakka','musakka'],['biftek','biftek'],['baget','tavuk baget'],['piliç','ızgara tavuk'],['tavuk','tavuk yemeği'],['köfte','köfte'],['bulgur','bulgur pilavı'],['pilav','pilav'],['mantı','mantı'],['makarna','makarna'],['börek','su böreği'],['ayran','ayran'],['cacık','cacık'],['yoğurt','yoğurt'],['humus','humus'],['dondurma','dondurma'],['baklava','baklava'],['sütlaç','sütlaç'],['aşure','aşure'],['revani','revani'],['helva','helva'],['kuru fasulye','kuru fasulye'],['taze fasulye','taze fasulye'],['fasulye','kuru fasulye'],['nohut','nohut yemeği'],['bamya','bamya yemeği'],['türlü','türlü'],['semizotu','semizotu yemeği'],['ıspanak','ıspanak yemeği'],['kısır','kısır'],['söğüş','söğüş'],['salata','salata'],['turşu','turşu'],['herse','keşkek'],['çorba','çorba']];
+    for(var i=0;i<map.length;i++){ if(n.indexOf(map[i][0])!==-1) return map[i][1]; }
+    var strip=['karışık','soslu','sade','terbiyeli','ferah','soğuk','sıcak','fırın','fırında','kasap','ev','közlenmiş','zeytinyağlı','etli','taze','mevsim','çıtır','özel','sebzeli','peynirli','mantarlı','mantar','yoğurtlu','ekşili','arpa','şehriyeli','mısırlı','biberiye','göbek','yeşil','çoban'];
+    var words=n.replace(/&/g,' ').replace(/\./g,' ').split(/\s+/).filter(function(w){return w&&strip.indexOf(w)===-1;});
+    return words.join(' ').trim()||n;
   }
 
   var DAYS = Object.keys(RAW).sort().map(function(iso){
-    var p = iso.split('-').map(Number), d = new Date(p[0], p[1]-1, p[2]);
-    return {
-      iso: iso, day: p[2], month: p[1], weekday: WD[d.getDay()],
-      dishes: RAW[iso].map(function(name){ var c = categorize(name); return { name:name, pretty:toTitleTr(name), emoji:c.emoji, label:c.label, grad:c.grad }; })
-    };
+    var p=iso.split('-').map(Number), dt=new Date(p[0],p[1]-1,p[2]);
+    return { iso:iso, day:p[2], month:p[1], weekday:WD[dt.getDay()],
+      dishes: RAW[iso].map(function(name){ var c=categorize(name); return {name:name, pretty:toTitleTr(name), emoji:c.emoji, category:c.label, tag:c.tag}; }) };
   });
+  var IDX={}; DAYS.forEach(function(d,i){ IDX[d.iso]=i; });
+  var CUR=null;
 
-  function build(){
-    var sel = document.getElementById('dateSelect');
-    sel.innerHTML = '<option value="">— Tarih seçin —</option>' + DAYS.map(function(d){
-      return '<option value="'+d.iso+'">'+d.day+' '+MONTHS[d.month-1]+' · '+d.weekday+'</option>';
-    }).join('');
-    sel.addEventListener('change', function(){ if(this.value) openDay(this.value, true); });
-    document.getElementById('todayBtn').addEventListener('click', function(){ openDay(pickDefault(), true); });
-    document.getElementById('search').addEventListener('input', function(){ applySearch(this.value); });
+  document.getElementById('dateSelect').innerHTML = DAYS.map(function(d){ return '<option value="'+d.iso+'">'+d.day+' '+MONTHS[d.month-1]+' · '+d.weekday+'</option>'; }).join('');
+  document.getElementById('dateSelect').addEventListener('change', function(){ if(this.value) showDay(this.value,true); });
+  document.getElementById('todayBtn').addEventListener('click', function(){ showDay(pickDefault(),true); });
+  document.getElementById('search').addEventListener('input', function(){ applySearch(this.value); });
 
-    var menu = document.getElementById('menu');
-    menu.innerHTML = DAYS.map(function(d){
-      var isToday = d.iso===TODAY;
-      var cards = d.dishes.map(function(dish){
-        return '<div class="dish" data-name="'+esc(trLower(dish.pretty))+'" data-q="'+esc(cleanQuery(dish.name))+'">'+
-          '<div class="thumb" style="background:linear-gradient(135deg,'+dish.grad[0]+','+dish.grad[1]+')">'+
-            '<span class="emoji">'+dish.emoji+'</span>'+
-            '<span class="cat">'+dish.emoji+' '+esc(dish.label)+'</span>'+
-          '</div><div class="name">'+esc(dish.pretty)+'</div></div>';
-      }).join('');
-      return '<section class="day" id="day-'+d.iso+'">'+
-        '<button class="day-head" type="button" data-iso="'+d.iso+'">'+
-          '<span class="day-date"><span class="d">'+d.day+'</span><span class="m">'+MONTHS_SHORT[d.month-1]+'</span></span>'+
-          '<span class="day-title"><span class="wd">'+esc(d.weekday)+(isToday?'<span class="today-tag">BUGÜN</span>':'')+'</span>'+
-          '<span class="sub">'+d.dishes.length+' çeşit yemek</span></span>'+
-          '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'+
-        '</button>'+
-        '<div class="day-body"><div class="dishes">'+cards+'</div></div>'+
-      '</section>';
-    }).join('');
+  function pickDefault(){ for(var i=0;i<DAYS.length;i++) if(DAYS[i].iso===TODAY) return DAYS[i].iso; for(var j=0;j<DAYS.length;j++) if(DAYS[j].iso>=TODAY) return DAYS[j].iso; return DAYS[0].iso; }
 
-    Array.prototype.forEach.call(document.querySelectorAll('.day-head'), function(h){
-      h.addEventListener('click', function(){ toggleDay(h.getAttribute('data-iso')); });
-    });
-
-    // Her yemek için gerçek fotoğrafı Türkçe Wikipedia'dan canlı yükle
-    // (yayınlanan sitede ve bu dosyayı tarayıcıda açtığınızda çalışır; kısıtlı
-    //  önizleme penceresinde engellenirse kategori simgesi kalır).
-    Array.prototype.forEach.call(document.querySelectorAll('.dish'), function(el){
-      loadPhoto(el, el.getAttribute('data-q'));
-    });
+  function dishHtml(dish){
+    var g=gradientFor(dish.tag);
+    return '<div class="dish" data-q="'+esc(dishQuery(dish.name))+'">'+
+      '<div class="thumb" style="background:linear-gradient(135deg,'+g[0]+','+g[1]+')">'+
+        '<span class="emoji">'+dish.emoji+'</span><span class="cat">'+dish.emoji+' '+esc(dish.category)+'</span>'+
+      '</div><div class="name">'+esc(dish.pretty)+'</div></div>';
   }
 
-  function cleanQuery(name){ return String(name).replace(/&/g,' ').replace(/\./g,' ').replace(/\s+/g,' ').trim(); }
-
-  function loadPhoto(dishEl, query){
-    if (!query || !window.fetch) return;
-    var api = 'https://tr.wikipedia.org/w/api.php?action=query&format=json&origin=*'+
-      '&generator=search&gsrsearch='+encodeURIComponent(query)+'&gsrlimit=1&gsrnamespace=0'+
-      '&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1';
-    fetch(api).then(function(r){ return r.json(); }).then(function(d){
-      var pages = d && d.query && d.query.pages; if(!pages) return;
-      var src=''; for(var k in pages){ var p=pages[k]; if(p.thumbnail&&p.thumbnail.source){ src=p.thumbnail.source; break; } }
-      if(!src) return;
-      var img = new Image();
-      img.onload = function(){
-        var t = dishEl.querySelector('.thumb'); if(!t) return;
-        img.className = 'photo';
-        t.insertBefore(img, t.firstChild);
-        t.classList.add('has-photo');
-      };
-      img.src = src;
-    }).catch(function(){});
+  function showDay(iso, scroll){
+    if(IDX[iso]===undefined) return; CUR=iso;
+    var i=IDX[iso], d=DAYS[i];
+    var sel=document.getElementById('dateSelect'); if(sel.value!==iso) sel.value=iso;
+    var hasPrev=i>0, hasNext=i<DAYS.length-1, isToday=iso===TODAY;
+    var menu=document.getElementById('menu');
+    menu.innerHTML='<section class="day">'+
+      '<div class="day-head">'+
+        '<span class="day-date"><span class="d">'+d.day+'</span><span class="m">'+MONTHS_SHORT[d.month-1]+'</span></span>'+
+        '<div class="day-title"><span class="wd">'+esc(d.weekday)+(isToday?'<span class="today-tag">BUGÜN</span>':'')+'</span><span class="sub">'+d.day+' '+MONTHS[d.month-1]+' · '+d.dishes.length+' çeşit yemek</span></div>'+
+        '<div class="daynav"><button class="navbtn" id="prevDay" '+(hasPrev?'':'disabled')+'>‹</button><button class="navbtn" id="nextDay" '+(hasNext?'':'disabled')+'>›</button></div>'+
+      '</div>'+
+      '<div class="dishes">'+d.dishes.map(dishHtml).join('')+'</div></section>';
+    if(hasPrev) document.getElementById('prevDay').addEventListener('click',function(){ showDay(DAYS[i-1].iso,true); });
+    if(hasNext) document.getElementById('nextDay').addEventListener('click',function(){ showDay(DAYS[i+1].iso,true); });
+    loadPhotos(menu);
+    if(scroll) window.scrollTo({top:0,behavior:'smooth'});
   }
 
-  function pickDefault(){
-    for (var i=0;i<DAYS.length;i++) if (DAYS[i].iso===TODAY) return DAYS[i].iso;
-    for (var j=0;j<DAYS.length;j++) if (DAYS[j].iso>=TODAY) return DAYS[j].iso;
-    return DAYS[0].iso;
-  }
-  function toggleDay(iso){
-    var el = document.getElementById('day-'+iso);
-    if (el.classList.contains('open')) el.classList.remove('open');
-    else openDay(iso, true);
-  }
-  function openDay(iso, scroll){
-    Array.prototype.forEach.call(document.querySelectorAll('.day.open'), function(e){ e.classList.remove('open'); });
-    var el = document.getElementById('day-'+iso); if(!el) return;
-    el.classList.add('open');
-    var sel = document.getElementById('dateSelect'); if (sel.value!==iso) sel.value = iso;
-    if (scroll) setTimeout(function(){ el.scrollIntoView({behavior:'smooth', block:'start'}); }, 60);
-  }
   function applySearch(q){
-    q = trLower((q||'').trim());
-    Array.prototype.forEach.call(document.querySelectorAll('.day'), function(day){
-      var any = false;
-      Array.prototype.forEach.call(day.querySelectorAll('.dish'), function(dish){
-        var m = !q || dish.getAttribute('data-name').indexOf(q)!==-1;
-        dish.style.display = m ? '' : 'none'; if (m) any = true;
-      });
-      if (!q) day.style.display='';
-      else { day.style.display = any?'':'none'; if(any) day.classList.add('open'); }
+    q=trLower((q||'').trim());
+    if(!q){ showDay(CUR||pickDefault(),false); return; }
+    var blocks=[];
+    DAYS.forEach(function(d){
+      var m=d.dishes.filter(function(dish){ return trLower(dish.pretty).indexOf(q)!==-1; });
+      if(!m.length) return;
+      blocks.push('<section class="day"><div class="day-head"><span class="day-date"><span class="d">'+d.day+'</span><span class="m">'+MONTHS_SHORT[d.month-1]+'</span></span><div class="day-title"><span class="wd">'+esc(d.weekday)+'</span><span class="sub">'+d.day+' '+MONTHS[d.month-1]+'</span></div></div><div class="dishes">'+m.map(dishHtml).join('')+'</div></section>');
     });
-    if (!q) { Array.prototype.forEach.call(document.querySelectorAll('.day.open'), function(e){ e.classList.remove('open'); }); openDay(pickDefault(), false); }
+    var menu=document.getElementById('menu');
+    menu.innerHTML=blocks.length?('<div class="search-head">“'+esc(q)+'” için '+blocks.length+' gün bulundu</div>'+blocks.join('')):('<div class="noresult">“'+esc(q)+'” için sonuç bulunamadı.</div>');
+    if(blocks.length) loadPhotos(menu);
   }
 
-  build();
-  openDay(pickDefault(), false);
+  function loadPhotos(root){ Array.prototype.forEach.call(root.querySelectorAll('.dish'), loadPhoto); }
+  function loadPhoto(el){
+    if(el.getAttribute('data-loaded')) return; el.setAttribute('data-loaded','1');
+    if(!window.fetch) return;
+    var q=el.getAttribute('data-q'); if(!q) return;
+    if(PHOTO_CACHE[q]!==undefined){ if(PHOTO_CACHE[q]) setPhoto(el,PHOTO_CACHE[q]); return; }
+    var api='https://tr.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=1&gsrnamespace=0&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1';
+    fetch(api).then(function(r){return r.json();}).then(function(d){
+      var src=''; var pages=d&&d.query&&d.query.pages;
+      if(pages){ for(var k in pages){ var p=pages[k]; if(p.thumbnail&&p.thumbnail.source){src=p.thumbnail.source;break;} } }
+      PHOTO_CACHE[q]=src; if(src) setPhoto(el,src);
+    }).catch(function(){ PHOTO_CACHE[q]=''; });
+  }
+  function setPhoto(el,src){
+    var t=el.querySelector('.thumb'); if(!t||t.classList.contains('has-photo')) return;
+    var img=new Image(); img.referrerPolicy='no-referrer';
+    img.onload=function(){ img.className='photo'; t.insertBefore(img,t.firstChild); t.classList.add('has-photo'); };
+    img.src=src;
+  }
+
+  showDay(pickDefault(), false);
 </script>
